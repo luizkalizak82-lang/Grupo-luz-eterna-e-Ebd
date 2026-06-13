@@ -16,8 +16,8 @@
             <nav id="nav-principal" style="display: none;">
                 <div class="nav-links">
                     <a onclick="navegarPara('tela-dashboard')">Início</a>
-                    <a onclick="navegarPara('tela-licoes')">Cronograma & Chamadas</a>
-                    <a onclick="navegarPara('tela-membros')">Membros</a>
+                    <a onclick="navegarPara('tela-licoes')">Cronograma EBD</a>
+                    <a onclick="navegarPara('tela-membros')">Diário de Classe</a>
                 </div>
                 <div class="user-status-bar">
                     Olá, <span id="nome-usuario-logado">Usuário</span> 
@@ -35,7 +35,7 @@
 
     <main>
         <section id="tela-auth" class="tela ativa">
-            <div class="auth-container">
+            <div class="auth-container card">
                 <div id="auth-login-view">
                     <h2>Entrar no Portal</h2>
                     <p class="subtitle">Digite seu nome completo para acessar as aulas</p>
@@ -67,36 +67,65 @@
         </section>
 
         <section id="tela-dashboard" class="tela">
-            <div id="dashboard-alert" class="alert alert-success" style="display: none;"></div>
             <div class="dashboard-grid" id="dashboard-dinamico-conteudo">
                 </div>
         </section>
 
         <section id="tela-licoes" class="tela">
+            
             <div class="card card-admin-action" id="painel-cadastro-licao" style="display: none;">
-                <h2>📝 Painel do Professor: Agendar Próximas Aulas</h2>
+                <h2>📝 Gerenciamento de Aulas: Inserir Conteúdo Dominical</h2>
+                <p style="color: var(--dourado-claro); font-size: 0.9rem; margin-bottom: 1.2rem;">Use esta área para publicar o tema da aula, perguntas reflexivas e as anotações do diário de classe.</p>
+                
                 <div class="form-group">
-                    <label for="post-tema">📖 Tema da Lição / Assunto</label>
-                    <input type="text" id="post-tema" placeholder="Ex: Lição 1 - O Livro de Juízes">
+                    <label for="post-tema">📖 Escolha o Tema ou Assunto</label>
+                    <input type="text" id="post-tema" placeholder="Ex: Lição 3 - Clamor e libertação: a liderança de Otniel">
                 </div>
+                
                 <div class="form-group">
-                    <label for="post-pergunta">✍️ Pergunta do Exercício</label>
-                    <input type="text" id="post-pergunta" placeholder="O que o aluno deve responder sobre este assunto?">
+                    <label for="post-pergunta">✍️ Exercício / Pergunta da Aula</label>
+                    <input type="text" id="post-pergunta" placeholder="O que os alunos devem responder após a ministração?">
                 </div>
+
                 <div class="form-group">
-                    <label for="post-status">⚡ Status Inicial da Aula</label>
+                    <label for="post-observacao">📋 Anotações e Observações Gerais da Aula</label>
+                    <input type="text" id="post-observacao" placeholder="Fatos relevantes, necessidades de oração detectadas, etc.">
+                </div>
+                
+                <div class="form-group">
+                    <label for="post-status">⚡ Estado Inicial do Conteúdo</label>
                     <select id="post-status" class="select-custom">
-                        <option value="agendada">📅 Agendada (Bloqueia Presença/Exercício)</option>
-                        <option value="aberta">🔓 Aberta para Hoje (Libera Presença/Exercício)</option>
+                        <option value="agendada">📅 Agendada (Apenas visualização do tema pelos alunos)</option>
+                        <option value="aberta">🔓 Aberta para Hoje (Libera chamada eletrônica e exercício)</option>
                     </select>
                 </div>
-                <button class="btn-principal" onclick="publicarNovaLicao()">🚀 Publicar Aula no Sistema</button>
+                <button class="btn-principal" onclick="publicarNovaLicao()">🚀 Publicar Aula na Plataforma</button>
+            </div>
+
+            <div class="card metricas-container-box">
+                <h2>📊 Frequência Geral de Alunos (Classe Juvenil)</h2>
+                <div class="metricas-flex-grid">
+                    <div class="metrica-item">
+                        <span class="metrica-num" id="txt-meta-alunos">50</span>
+                        <span class="metrica-lbl">Alunos na Meta</span>
+                    </div>
+                    <div class="metrica-item">
+                        <span class="metrica-num" id="txt-presentes-hoje">0</span>
+                        <span class="metrica-lbl">Presentes Hoje</span>
+                    </div>
+                    <div class="metrica-item">
+                        <span class="metrica-num" id="txt-porcentagem-hoje">0%</span>
+                        <span class="metrica-lbl">Aproveitamento</span>
+                    </div>
+                </div>
+                <div class="metric-container">
+                    <div class="metric-bar" id="barra-progresso-frequencia"></div>
+                </div>
             </div>
 
             <div class="card">
-                <h2>📚 Cronograma de Estudos EBD</h2>
-                <p class="view-desc" style="margin-bottom: 1.5rem;">Acompanhe o andamento das lições. A presença só é permitida em aulas com status "Aberta".</p>
-                
+                <h2>📅 Cronograma Oficial e Registro de Matérias</h2>
+                <p style="color: var(--dourado-claro); margin-bottom: 1.5rem; font-size: 0.9rem;">As lições programadas aparecem listadas abaixo. A chamada fica restrita às aulas marcadas como "Aberta para Hoje".</p>
                 <div id="feed-licoes">
                     </div>
             </div>
@@ -104,16 +133,16 @@
 
         <section id="tela-membros" class="tela">
             <div class="card">
-                <h2>👥 Lista de Membros Cadastrados</h2>
-                <div class="membros-list" id="lista-oficial-membros">
-                    </div>
+                <h2>👥 Diário de Classe: Lista Oficial de Membros</h2>
+                <p style="color: var(--dourado-claro); font-size: 0.9rem; margin-bottom: 1rem;">Professores e Líderes oficiais possuem permissões administrativas automaticamente.</p>
+                <div class="membros-list" id="lista-oficial-membros"></div>
             </div>
         </section>
     </main>
 
     <footer>
         <p>&copy; 2026 Grupo de Jovens Luz Eterna - Escola Bíblica Dominical</p>
-        <p class="footer-sub">Mapeamento de Presenças e Engajamento de Alunos</p>
+        <p class="footer-sub">Mapeamento Integrado de Frequência e Crescimento Bíblico</p>
     </footer>
 
     <script src="script.js"></script>
