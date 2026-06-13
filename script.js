@@ -1,283 +1,352 @@
-/* ==========================================================================
-   JAVASCRIPT: PROGRAMAÇÃO E LÓGICA DINÂMICA DO PORTAL
-   ========================================================================== */
-const TOTAL_ALUNOS_MATRICULADOS = 42; 
+// ==========================================================================
+// ARQUIVO LÓGICO: CONTROLE DE PERMISSÕES, LÍDERES, FREQUÊNCIA E CRONOGRAMAS
+// ==========================================================================
 
-// Banco de Dados das Lições e Cronogramas
-const licoes = [
-    { id: 1, revista: 'atual', num: 13, data: '2026-06-21', tema: 'O Triunfo e o Alívio', desc: 'Lição final de encerramento da revista corrente com grandes ensinamentos de vitória espiritual.', status: 'Agendada' },
-    { id: 2, revista: 'atual', num: 14, data: '2026-06-28', tema: 'Discernimento Cristão', desc: 'Análise sobre a importância do discernment bíblico na caminhada do jovem contemporâneo.', status: 'Agendada' },
-    
-    { id: 3, revista: 'nova', num: 1, data: '2026-07-05', tema: 'O Livro de Juízes: Quando cada um fazia o que parecia certo', desc: 'Introdução histórica e espiritual ao período dos juízes e o perigo do relativismo moral.', status: 'Agendada' },
-    { id: 4, revista: 'nova', num: 2, data: '2026-07-12', tema: 'A Fidelidade a Deus: Uma questão de escolha', desc: 'Estudo prático sobre o livre arbítrio e o peso das escolhas diante da soberania divina.', status: 'Agendada' },
-    { id: 5, revista: 'nova', num: 3, data: '2026-07-19', tema: 'O Clamor e a Libertação da Liderança de Otoniel', desc: 'Como o arrependimento do povo move o coração de Deus para levantar os libertadores.', status: 'Agendada' },
-    { id: 6, revista: 'nova', num: 4, data: '2026-07-26', tema: 'Sangar: Deus usa os improváveis', desc: 'Reflexão sobre como Deus capacita e usa pessoas comuns e ferramentas simples para grandes vitórias.', status: 'Agendada' },
-    { id: 7, revista: 'nova', num: 5, data: '2026-08-02', tema: 'Débora, Baraque e União para fazer a Obra de Deus', desc: 'A importância da parceria, coragem feminina e submissão ao comando do Senhor.', status: 'Agendada' },
-    { id: 8, revista: 'nova', num: 6, data: '2026-08-09', tema: 'Gideão: Deus transforma a insecurity em coragem', desc: 'A jornada de superação do menor da casa de seu pai, transformado em guerreiro valoroso.', status: 'Agendada' },
-    { id: 9, revista: 'nova', num: 7, data: '2026-08-16', tema: 'O Final da Liderança de Gideão e o Governo de Abimeleque', desc: 'Alertas cruciais sobre o perigo do orgulho e a ambição desmedida pelo poder terreno.', status: 'Agendada' },
-    { id: 10, revista: 'nova', num: 8, data: '2026-08-23', tema: 'Jefté: De rejeitado a libertador', desc: 'Superando rejeições familiares e sociais através do cumprimento do propósito divino.', status: 'Agendada' },
-    { id: 11, revista: 'nova', num: 9, data: '2026-08-30', tema: 'Sansão: A força e a fraqueza de um jovem', desc: 'Estudo focado na juventude, os dons extraordinários e a necessidade vital de domínio próprio.', status: 'Agendada' },
-    { id: 12, revista: 'nova', num: 10, data: '2026-09-06', tema: 'Sansão entre Vitórias e Derrotas', desc: 'A misericórdia divina que permanece ativa mesmo diante das falhas e quedas humanas.', status: 'Agendada' },
-    { id: 13, revista: 'nova', num: 11, data: '2026-09-13', tema: 'Crise Espiritual e Falsa Religiosidade', desc: 'Desmascarando rituais vazios e a idolatria camuflada no cotidiano cristão.', status: 'Agendada' },
-    { id: 14, revista: 'nova', num: 12, data: '2026-09-20', tema: 'Tempos de Decadência Moral e Maldade', desc: 'Como o afastamento das Escrituras gera o colapso ético e social de uma comunidade.', status: 'Agendada' },
-    { id: 15, revista: 'nova', num: 13, data: '2026-09-27', tema: 'Esperança em Meio ao Caos: Aguardando a vinda do Rei', desc: 'Encerramento triunfal apontando para a redenção plena e o Reinado Supremo de Cristo.', status: 'Agendada' }
+// Lista oficial estrita de Professores e Líderes definidos pela coordenação
+// Nota: O sistema reconhecerá você pelo seu nome completo exato conforme abaixo
+const LISTA_PROFESSORES = [
+    "Luís Gustavo Machado Calizaki", 
+    "Michel", 
+    "Júnior", 
+    "Débora", 
+    "Eclair"
 ];
+const TOTAL_ALUNOS_META = 50; // Base fixa de alunos para cálculo de métricas
 
-let usuarioLogado = null;
+// Inicialização de banco de dados fictício no LocalStorage para persistência de dados local
+if (!localStorage.getItem('bd_licoes')) {
+    const licoesIniciais = [
+        { id: 1, tema: "Lição Atual - Encerramento do Trimestre", pergunta: "Qual o maior ensinamento você tirou deste trimestre?" },
+        { id: 2, tema: "Nova Revista - Introdução ao Livro de Juízes", pergunta: "Por que o ciclo de apostasia se repetia em Juízes?" }
+    ];
+    localStorage.setItem('bd_licoes', JSON.stringify(licoesIniciais));
+}
+if (!localStorage.getItem('bd_presenças')) localStorage.setItem('bd_presenças', JSON.stringify([]));
+if (!localStorage.getItem('bd_membros')) localStorage.setItem('bd_membros', JSON.stringify([]));
+if (!localStorage.getItem('bd_respostas')) localStorage.setItem('bd_respostas', JSON.stringify([]));
 
-// Inicialização automática ao abrir o site
-document.addEventListener("DOMContentLoaded", () => {
-    inicializarBancoFalso();
-    renderizarLicoes();
-    verificarSessao();
-    atualizarWidgets();
-});
+// --- CONTROLE DE TELAS (AUTENTICAÇÃO) ---
+function alternarAbasAuth(queroCadastrar) {
+    document.getElementById('auth-login-view').style.display = queroCadastrar ? 'none' : 'block';
+    document.getElementById('auth-cadastro-view').style.display = queroCadastrar ? 'block' : 'none';
+    fecharAlertas();
+}
 
-function inicializarBancoFalso() {
-    if (!localStorage.getItem("ebd_membros")) {
-        const membrosIniciais = [
-            { nome: "Professor Lucas Oliveira", funcao: "Líder/Professor", presencas: ["2026-06-21"] },
-            { nome: "Amanda Costa Medeiros", funcao: "Aluno", presencas: ["2026-06-21"] },
-            { nome: "Mateus Henrique Souza", funcao: "Aluno", presencas: ["2026-06-21"] },
-            { nome: "Sarah Rebeca Lima", funcao: "Aluno", presencas: ["2026-06-21"] },
-            { nome: "Daniel Ferreira", funcao: "Aluno", presencas: ["2026-06-21"] }
-        ];
-        localStorage.setItem("ebd_membros", JSON.stringify(membrosIniciais));
+// --- VALIDAÇÃO RESTRITA DE NOME COMPLETO ---
+function validarNomeCompleto(nome) {
+    const partesNome = nome.trim().split(/\s+/);
+    
+    // Regra 1: Tem que ter pelo menos o nome e um sobrenome (mínimo 2 palavras)
+    if (partesNome.length < 2) {
+        return { valido: false, mensagem: "Por favor, insira seu nome COMPLETO (Nome e Sobrenome). Não são permitidos nomes únicos." };
     }
+
+    // Regra 2: Bloquear abreviações terminadas em ponto ou com apenas 1 ou 2 letras isoladas (Ex: "Luis G.", "L. Gustavo")
+    const possuiAbreviacao = partesNome.some(parte => {
+        return parte.includes('.') || (parte.length <= 2 && !["da", "de", "do", "das", "dos"].includes(parte.toLowerCase()));
+    });
+
+    if (possuiAbreviacao) {
+        return { valido: false, mensagem: "Não utilize abreviações ou pontos. Digite seus sobrenomes por extenso." };
+    }
+
+    return { valido: true };
 }
 
-function navegarPara(idTela) {
-    document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
-    document.getElementById(idTela).classList.add('ativa');
-    atualizarWidgets();
+function verificarSeEhProfessor(nome) {
+    return LISTA_PROFESSORES.some(p => p.trim().toLowerCase() === nome.trim().toLowerCase());
 }
 
-function alternarAbasAuth(mostrarCadastro) {
-    document.getElementById("auth-login-view").style.display = mostrarCadastro ? "none" : "block";
-    document.getElementById("auth-cadastro-view").style.display = mostrarCadastro ? "block" : "none";
-}
-
+// --- FLUXO DE CADASTRO ---
 function executarCadastro() {
-    const nomeInput = document.getElementById("cadastro-nome").value.trim();
-    const funcaoInput = document.getElementById("cadastro-funcao").value;
-    const alertBox = document.getElementById("cadastro-alert");
+    const nomeInput = document.getElementById('cadastro-nome').value.trim();
+    if (!nomeInput) { return mostrarAlerta('cadastro-alert', 'Por favor, insira seu nome.'); }
 
-    if (!nomeInput) {
-        alertBox.textContent = "Por favor, insira o seu nome completo.";
-        alertBox.style.display = "block";
-        return;
+    // Aplica a nova validação rígida de segurança
+    const validacao = validarNomeCompleto(nomeInput);
+    if (!validacao.valido) {
+        return mostrarAlerta('cadastro-alert', validacao.mensagem);
     }
 
-    let membros = JSON.parse(localStorage.getItem("ebd_membros"));
-
+    let membros = JSON.parse(localStorage.getItem('bd_membros'));
     if (membros.some(m => m.nome.toLowerCase() === nomeInput.toLowerCase())) {
-        alertBox.textContent = "Este nome já se encontra registrado no grupo.";
-        alertBox.style.display = "block";
-        return;
+        return mostrarAlerta('cadastro-alert', 'Este nome já se encontra registrado no portal.');
     }
 
-    const novoMembro = { nome: nomeInput, funcao: funcaoInput, presencas: [] };
+    const ehProf = verificarSeEhProfessor(nomeInput);
+    const novoMembro = { nome: nomeInput, cargo: ehProf ? "Líder/Professor" : "Aluno" };
     membros.push(novoMembro);
-    localStorage.setItem("ebd_membros", JSON.stringify(membros));
+    localStorage.setItem('bd_membros', JSON.stringify(membros));
 
-    definirSessaoUsuario(novoMembro);
+    localStorage.setItem('usuarioLogado', novoMembro.nome);
+    localStorage.setItem('perfil', ehProf ? 'professor' : 'aluno');
+    iniciarSessao();
 }
 
+// --- FLUXO DE LOGIN ---
 function executarLogin() {
-    const nomeInput = document.getElementById("login-nome").value.trim();
-    const alertBox = document.getElementById("login-alert");
+    const nomeInput = document.getElementById('login-nome').value.trim();
+    if (!nomeInput) { return mostrarAlerta('login-alert', 'Por favor, informe seu nome.'); }
 
-    if (!nomeInput) {
-        alertBox.textContent = "Por favor, digite o seu nome para acessar.";
-        alertBox.style.display = "block";
+    let membros = JSON.parse(localStorage.getItem('bd_membros'));
+    let usuario = membros.find(m => m.nome.toLowerCase() === nomeInput.toLowerCase());
+
+    // Auto-cadastro para professores da lista oficial que entrarem pela primeira vez
+    if (!usuario && verificarSeEhProfessor(nomeInput)) {
+        usuario = { nome: nomeInput, cargo: "Líder/Professor" };
+        membros.push(usuario);
+        localStorage.setItem('bd_membros', JSON.stringify(membros));
+    }
+
+    if (!usuario) {
+        return mostrarAlerta('login-alert', 'Nome não localizado. Se você é um aluno novo, clique em "Cadastre-se aqui" logo abaixo.');
+    }
+
+    localStorage.setItem('usuarioLogado', usuario.nome);
+    localStorage.setItem('perfil', usuario.cargo === "Líder/Professor" ? 'professor' : 'aluno');
+    iniciarSessao();
+}
+
+// --- SESSÃO ATIVA & RENDERIZAÇÃO DIRECIONADA ---
+function iniciarSessao() {
+    const nome = localStorage.getItem('usuarioLogado');
+    const perfil = localStorage.getItem('perfil');
+
+    document.getElementById('nome-usuario-logado').innerText = nome;
+    const badge = document.getElementById('badge-perfil');
+    badge.innerText = perfil === 'professor' ? 'Professor' : 'Aluno';
+    badge.className = perfil === 'professor' ? 'badge-role role-professor' : 'badge-role role-aluno';
+
+    document.getElementById('nav-principal').style.display = 'flex';
+    document.getElementById('tela-auth').classList.remove('ativa');
+    document.getElementById('tela-dashboard').classList.add('ativa');
+
+    document.getElementById('painel-cadastro-licao').style.display = perfil === 'professor' ? 'block' : 'none';
+
+    construirDashboardDinamico();
+    atualizarFeedLicoes();
+    listarMembrosNaTela();
+}
+
+// --- CONSTRUTOR DINÂMICO DE PORTAL (ALUNO VS PROFESSOR) ---
+function construirDashboardDinamico() {
+    const container = document.getElementById('dashboard-dinamico-conteudo');
+    const perfil = localStorage.getItem('perfil');
+    const nomeUser = localStorage.getItem('usuarioLogado');
+
+    const presencas = JSON.parse(localStorage.getItem('bd_presenças'));
+    const totalAlunosPresentes = presencas.length;
+    const porcentagemTurma = ((totalAlunosPresentes / TOTAL_ALUNOS_META) * 100).toFixed(0);
+
+    if (perfil === 'professor') {
+        container.innerHTML = `
+            <div class="col-esquerda">
+                <div class="card card-admin-action">
+                    <h2>⚙️ Painel de Comando</h2>
+                    <p style="margin-bottom:1rem;">Olá Líder, use as abas do menu superior para inserir matérias ou analisar a lista completa de presença dos alunos.</p>
+                    <button class="btn-principal" onclick="navegarPara('tela-licoes')">Ir para Área de Postagens</button>
+                </div>
+            </div>
+            <div class="col-direita">
+                <div class="card">
+                    <h2>📊 Frequência em Tempo Real (Turma)</h2>
+                    <p>Meta Fixa da Sala: <strong>${TOTAL_ALUNOS_META} Alunos</strong> (Professores não alteram a métrica).</p>
+                    <div class="metric-container">
+                        <div class="metric-bar" style="width: ${porcentagemTurma}%"></div>
+                        <div class="metric-text">${porcentagemTurma}% (${totalAlunosPresentes} de ${TOTAL_ALUNOS_META})</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    } else {
+        const jaDeuPresenca = presencas.includes(nomeUser);
+        const frequenciaPessoal = jaDeuPresenca ? "100%" : "0%";
+
+        container.innerHTML = `
+            <div class="col-esquerda">
+                <div class="card card-presenca-hoje">
+                    <h2>📍 Chamada Eletrônica</h2>
+                    <p>Confirme que você está assistindo à aula do grupo <strong>Luz Eterna</strong> de hoje.</p>
+                    <button id="btn-marcar-presenca" class="btn-presence" ${jaDeuPresenca ? 'disabled' : ''} onclick="marcarPresencaAluno()">
+                        ${jaDeuPresenca ? '✅ PRESENÇA CONFIRMADA' : 'MARCAR MINHA PRESENÇA'}
+                    </button>
+                </div>
+            </div>
+            <div class="col-direita">
+                <div class="card">
+                    <h2>📊 Meu Aproveitamento</h2>
+                    <p>Sua assiduidade registrada no sistema neste domingo:</p>
+                    <div class="metric-container">
+                        <div class="metric-bar" style="width: ${frequenciaPessoal}"></div>
+                        <div class="metric-text">${frequenciaPessoal} de Presença</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+// --- REGRAS DE PRESENÇA DOS ALUNOS ---
+function marcarPresencaAluno() {
+    const nome = localStorage.getItem('usuarioLogado');
+    const perfil = localStorage.getItem('perfil');
+
+    if (perfil === 'professor') {
+        alert('Líderes e Professores possuem presença automática e permanente, não alterando a meta de alunos.');
         return;
     }
 
-    const membros = JSON.parse(localStorage.getItem("ebd_membros"));
-    const usuarioEncontrado = membros.find(m => m.nome.toLowerCase() === nomeInput.toLowerCase());
+    let presencas = JSON.parse(localStorage.getItem('bd_presenças'));
+    if (!presencas.includes(nome)) {
+        presencas.push(nome);
+        localStorage.setItem('bd_presenças', JSON.stringify(presencas));
+    }
 
-    if (!usuarioEncontrado) {
-        alertBox.textContent = "Nome não localizado. Verifique se digitou corretamente ou faça o cadastro.";
-        alertBox.style.display = "block";
+    construirDashboardDinamico();
+    mostrarAlerta('dashboard-alert', 'Presença computada com sucesso na classe Luz Eterna!');
+}
+
+// --- CRIAÇÃO DE CONTEÚDO (PROFESSOR INSERE) ---
+function publicarNovaLicao() {
+    const tema = document.getElementById('post-tema').value.trim();
+    const pergunta = document.getElementById('post-pergunta').value.trim();
+
+    if (!tema || !pergunta) {
+        alert('Por favor, preencha o tema e a pergunta da atividade.');
         return;
     }
 
-    definirSessaoUsuario(usuarioEncontrado);
+    let licoes = JSON.parse(localStorage.getItem('bd_licoes'));
+    const nova = { id: Date.now(), tema: tema, pergunta: pergunta };
+    licoes.unshift(nova);
+
+    localStorage.setItem('bd_licoes', JSON.stringify(licoes));
+    
+    document.getElementById('post-tema').value = '';
+    document.getElementById('post-pergunta').value = '';
+
+    alert('Lição e Atividade publicadas com sucesso!');
+    atualizarFeedLicoes();
 }
 
-function definirSessaoUsuario(membro) {
-    usuarioLogado = membro;
-    localStorage.setItem("ebd_sessao_atual", JSON.stringify(membro));
-    
-    document.getElementById("nome-usuario-logado").textContent = membro.nome;
-    document.getElementById("nav-principal").style.display = "flex";
-    document.getElementById("tela-auth").classList.remove('ativa');
-    
-    navegarPara("tela-dashboard");
-}
+// --- RENDERIZAR LIÇÕES E ATIVIDADES ---
+function atualizarFeedLicoes() {
+    const feed = document.getElementById('feed-licoes');
+    const licoes = JSON.parse(localStorage.getItem('bd_licoes'));
+    const perfil = localStorage.getItem('perfil');
+    const nomeUser = localStorage.getItem('usuarioLogado');
+    const respostas = JSON.parse(localStorage.getItem('bd_respostas'));
 
-function verificarSessao() {
-    const sessaoSalva = localStorage.getItem("ebd_sessao_atual");
-    if (sessaoSalva) {
-        const dados = JSON.parse(sessaoSalva);
-        const membros = JSON.parse(localStorage.getItem("ebd_membros"));
-        const mestre = membros.find(m => m.nome === dados.nome);
-        if (mestre) definirSessaoUsuario(mestre);
+    if (licoes.length === 0) {
+        feed.innerHTML = '<p>Nenhuma matéria cadastrada ainda.</p>';
+        return;
     }
+
+    feed.innerHTML = '';
+    licoes.forEach(licao => {
+        const jaRespondeu = respostas.some(r => r.licaoId === licao.id && r.aluno === nomeUser);
+
+        let areaInteracao = '';
+        if (perfil === 'aluno') {
+            areaInteracao = jaRespondeu 
+                ? `<p style="color:var(--sucesso); font-weight:bold; margin-top:0.5rem;">✅ Você já enviou sua resposta para esta atividade.</p>`
+                : `<div class="atividade-box" id="box-${licao.id}">
+                    <p><strong>Atividade:</strong> ${licao.pergunta}</p>
+                    <input type="text" id="input-${licao.id}" placeholder="Escreva sua resposta aqui...">
+                    <button onclick="enviarRespostaAluno(${licao.id})">Enviar</button>
+                   </div>`;
+        } else {
+            const respostasDaLicao = respostas.filter(r => r.licaoId === licao.id);
+            let listaRespostasProf = '';
+            respostasDaLicao.forEach(r => {
+                listaRespostasProf += `<p style="font-size:0.85rem; border-top:1px dashed #ccc; padding-top:4px;"><strong>${r.aluno}:</strong> ${r.texto}</p>`;
+            });
+
+            areaInteracao = `<div class="atividade-box">
+                <p><strong>Pergunta Ativa:</strong> ${licao.pergunta}</p>
+                <div style="margin-top:0.5rem; background:white; padding:0.5rem; border-radius:4px;">
+                    <span style="font-size:0.8rem; font-weight:bold; color:var(--azul-medio);">Respostas dos Alunos (${respostasDaLicao.length}):</span>
+                    ${listaRespostasProf || '<p style="font-size:0.8rem; color:gray;">Nenhuma resposta enviada ainda.</p>'}
+                </div>
+               </div>`;
+        }
+
+        feed.innerHTML += `
+            <div class="licao-timeline-item">
+                <h3>${licao.tema}</h3>
+                ${areaInteracao}
+            </div>
+        `;
+    });
+}
+
+// --- SUBMISSÃO DE ATIVIDADES PELO ALUNO ---
+function enviarRespostaAluno(licaoId) {
+    const input = document.getElementById(`input-${licaoId}`);
+    const respostaTexto = input.value.trim();
+    const nomeUser = localStorage.getItem('usuarioLogado');
+
+    if (!respostaTexto) {
+        alert('Escreva uma resposta válida antes de enviar.');
+        return;
+    }
+
+    let respostas = JSON.parse(localStorage.getItem('bd_respostas'));
+    respostas.push({ licaoId: licaoId, aluno: nomeUser, texto: respostaTexto });
+    localStorage.setItem('bd_respostas', JSON.stringify(respostas));
+
+    alert('Sua atividade foi registrada pelo professor!');
+    atualizarFeedLicoes();
+}
+
+// --- LISTA DE MEMBROS ---
+function listarMembrosNaTela() {
+    const container = document.getElementById('lista-oficial-membros');
+    const membros = JSON.parse(localStorage.getItem('bd_membros'));
+
+    if (membros.length === 0) {
+        container.innerHTML = '<p>Nenhum membro cadastrado nesta rede local.</p>';
+        return;
+    }
+
+    container.innerHTML = '';
+    membros.forEach(m => {
+        const classeBadge = m.cargo === 'Líder/Professor' ? 'role-professor' : 'role-aluno';
+        container.innerHTML += `
+            <div class="membro-row">
+                <span class="membro-name">${m.nome}</span>
+                <span class="membro-badge ${classeBadge}">${m.cargo}</span>
+            </div>
+        `;
+    });
+}
+
+// --- ROTINAS AUXILIARES ---
+function navegarPara(telaId) {
+    document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
+    document.getElementById(telaId).classList.add('ativa');
+    fecharAlertas();
+}
+
+function mostrarAlerta(idElemento, msg) {
+    const el = document.getElementById(idElemento);
+    el.innerText = msg;
+    el.style.display = 'block';
+}
+
+function fecharAlertas() {
+    document.querySelectorAll('.alert').forEach(a => a.style.display = 'none');
 }
 
 function fazerLogout() {
-    localStorage.removeItem("ebd_sessao_atual");
-    usuarioLogado = null;
-    document.getElementById("nav-principal").style.display = "none";
-    navegarPara("tela-auth");
+    localStorage.removeItem('usuarioLogado');
+    localStorage.removeItem('perfil');
+    window.location.reload();
 }
 
-function renderizarLicoes() {
-    const containerAtual = document.getElementById("lista-revista-atual");
-    const containerNova = document.getElementById("lista-revista-nova");
-    
-    containerAtual.innerHTML = "";
-    containerNova.innerHTML = "";
-
-    licoes.forEach(lic => {
-        const dataFormatada = new Date(lic.data + 'T00:00:00').toLocaleDateString('pt-BR');
-        const html = `
-            <div class="lesson-item">
-                <div class="lesson-info">
-                    <h4>Lição ${lic.num}: ${lic.tema}</h4>
-                    <p>${lic.desc}</p>
-                    <p style="margin-top: 0.3rem; font-size: 0.8rem; color: var(--azul-medio); font-weight: 500;">
-                        📅 Domingo: ${dataFormatada}
-                    </p>
-                </div>
-                <div>
-                    <span class="lesson-badge ${lic.num === 13 && lic.revista === 'atual' ? 'badge-next' : 'badge-scheduled'}">
-                        ${lic.num === 13 && lic.revista === 'atual' ? 'Próxima Aula' : lic.status}
-                    </span>
-                </div>
-            </div>
-        `;
-        if (lic.revista === 'atual') containerAtual.innerHTML += html;
-        else containerNova.innerHTML += html;
-    });
-}
-
-function obterAulaDestaque() {
-    return licoes.find(l => l.num === 13 && l.revista === 'atual');
-}
-
-function atualizarWidgets() {
-    if (!usuarioLogado) return;
-
-    const aula = obterAulaDestaque();
-    const dataAulaFormatada = new Date(aula.data + 'T00:00:00').toLocaleDateString('pt-BR');
-
-    // 1. Destaque da Aula
-    const areaDestaque = document.getElementById("conteudo-proxima-aula");
-    areaDestaque.innerHTML = `
-        <h3 style="color: var(--azul-medio); margin-bottom: 0.4rem;">Lição ${aula.num} - ${aula.tema}</h3>
-        <p style="font-size: 0.95rem; color: var(--cinza-texto); margin-bottom: 0.8rem;">${aula.desc}</p>
-        <span style="font-size: 0.85rem; background-color: var(--dourado-claro); padding: 0.2rem 0.6rem; border-radius: 4px; font-weight: 600;">
-            📅 Data Oficial: ${dataAulaFormatada}
-        </span>
-    `;
-
-    // 2. Caixa de chamada rápida
-    document.getElementById("presence-date-text").textContent = dataAulaFormatada;
-    document.getElementById("presence-theme-text").textContent = `Tema: ${aula.tema}`;
-
-    const membros = JSON.parse(localStorage.getItem("ebd_membros"));
-    const eu = membros.find(m => m.nome === usuarioLogado.nome);
-    const btnPresenca = document.getElementById("btn-marcar-presenca");
-
-    if (eu && eu.presencas.includes(aula.data)) {
-        btnPresenca.textContent = "✓ PRESENÇA CONFIRMADA";
-        btnPresenca.disabled = true;
-        btnPresenca.style.backgroundColor = "#7bc696";
-    } else {
-        btnPresenca.textContent = "CONFIRMAR PRESENÇA";
-        btnPresenca.disabled = false;
-        btnPresenca.style.backgroundColor = "var(--sucesso)";
+// Verificação de persistência em recarregamentos de página
+window.onload = () => {
+    if (localStorage.getItem('usuarioLogado')) {
+        iniciarSessao();
     }
-
-    // 3. Cálculos matemáticos baseados nos 42 Alunos
-    const totalPresentesHoje = membros.filter(m => m.presencas.includes(aula.data)).length;
-    const porcentagemGeral = ((totalPresentesHoje / TOTAL_ALUNOS_MATRICULADOS) * 100).toFixed(1);
-
-    const barraProgresso = document.getElementById("barra-progresso-aula");
-    const textoProgresso = document.getElementById("texto-progresso-aula");
-    const insightTexto = document.getElementById("insight-presenca");
-
-    barraProgresso.style.width = `${Math.min(porcentagemGeral, 100)}%`;
-    textoProgresso.textContent = `${porcentagemGeral}% (${totalPresentesHoje} de ${TOTAL_ALUNOS_MATRICULADOS} presentes)`;
-
-    if (porcentagemGeral == 0) {
-        insightTexto.textContent = "⏰ Nenhum aluno registrou presença ainda. Vamos incentivar a classe!";
-        insightTexto.style.color = "var(--alerta)";
-    } else if (porcentagemGeral < 50) {
-        insightTexto.textContent = "📉 Estamos abaixo da metade da classe. Incentive os jovens a confirmarem!";
-        insightTexto.style.color = "var(--alerta)";
-    } else if (porcentagemGeral >= 50 && porcentagemGeral < 80) {
-        insightTexto.textContent = "🚀 Mais da metade da classe presente! Glória a Deus, continue convidando.";
-        insightTexto.style.color = "var(--azul-medio)";
-    } else {
-        insightTexto.textContent = "🔥 Excelente engajamento! Quase a totalidade dos 42 alunos participando!";
-        insightTexto.style.color = "var(--sucesso)";
-    }
-
-    // 4. Mini Ranking lateral
-    const areaRanking = document.getElementById("dashboard-ranking");
-    areaRanking.innerHTML = "";
-    const membrosOrdenados = [...membros].sort((a,b) => b.presencas.length - a.presencas.length).slice(0, 4);
-    membrosOrdenados.forEach(m => {
-        areaRanking.innerHTML += `
-            <div class="membro-row">
-                <span class="membro-name">${m.nome} <small style="color: #888; font-size: 0.75rem;">(${m.funcao})</small></span>
-                <span class="membro-stats">${m.presencas.length} pres.</span>
-            </div>
-        `;
-    });
-
-    // 5. Lista completa na aba de Membros
-    const areaMembrosCompleta = document.getElementById("lista-oficial-membros");
-    areaMembrosCompleta.innerHTML = "";
-    membros.forEach(m => {
-        const listaDatas = m.presencas.length > 0 
-            ? m.presencas.map(d => new Date(d + 'T00:00:00').toLocaleDateString('pt-BR')).join(', ') 
-            : "Nenhuma presença registrada ainda";
-
-        areaMembrosCompleta.innerHTML += `
-            <div style="padding: 1rem; border-bottom: 1px solid #eee; margin-bottom: 0.5rem; background-color: #fcfdfd; border-radius: 6px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
-                    <strong style="color: var(--azul-escuro); font-size: 1.05rem;">${m.nome}</strong>
-                    <span style="font-size: 0.8rem; padding: 0.2rem 0.5rem; background-color: var(--azul-medio); color: white; border-radius: 4px;">${m.funcao}</span>
-                </div>
-                <p style="font-size: 0.85rem; color: var(--cinza-texto);">
-                    <strong>Dias presentes:</strong> <span style="color: var(--sucesso); font-weight: 500;">${listaDatas}</span> (${m.presencas.length} frequências registradas)
-                </p>
-            </div>
-        `;
-    });
-}
-
-function marcarPresencaAtual() {
-    if (!usuarioLogado) return;
-    const aula = obterAulaDestaque();
-    let membros = JSON.parse(localStorage.getItem("ebd_membros"));
-    const index = membros.findIndex(m => m.nome === usuarioLogado.nome);
-    
-    if (index !== -1) {
-        if (!membros[index].presencas.includes(aula.data)) {
-            membros[index].presencas.push(aula.data);
-            localStorage.setItem("ebd_membros", JSON.stringify(membros));
-            
-            const dashAlert = document.getElementById("dashboard-alert");
-            dashAlert.textContent = `Glória a Deus! Sua presença na Lição ${aula.num} foi registrada!`;
-            dashAlert.style.display = "block";
-            setTimeout(() => dashAlert.style.display = "none", 5000);
-
-            atualizarWidgets();
-        }
-    }
-}
+};
