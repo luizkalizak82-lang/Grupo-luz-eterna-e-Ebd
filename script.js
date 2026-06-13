@@ -1,53 +1,53 @@
 // ==========================================================================
-// ARQUIVO LÓGICO: CONTROLE DE PERMISSÕES, LÍDERES, FREQUÊNCIA E CRONOGRAMAS
+// ARQUIVO LÓGICO COMPLETO COM CORREÇÃO DE LIDERANÇA E TRAVA DE STATUS
 // ==========================================================================
 
-// Lista oficial estrita de Professores e Líderes definidos pela coordenação
-// Nota: O sistema reconhecerá você pelo seu nome completo exato conforme abaixo
+// Lista oficial com nomes corrigidos para privilégio de Professor/Líder
 const LISTA_PROFESSORES = [
-    "Luís Gustavo Machado Calizaki", 
-    "Michel", 
+    "Luiz Gustavo Machado Kalizak", 
+    "Michael", 
+    "Eclair", 
     "Júnior", 
-    "Débora", 
-    "Eclair"
+    "Débora"
 ];
-const TOTAL_ALUNOS_META = 50; // Base fixa de alunos para cálculo de métricas
+const TOTAL_ALUNOS_META = 50; // Alunos alvo do cálculo de frequência
 
-// Inicialização de banco de dados fictício no LocalStorage para persistência de dados local
+// Carga de lições iniciais padrão da revista se o navegador estiver vazio
 if (!localStorage.getItem('bd_licoes')) {
     const licoesIniciais = [
-        { id: 1, tema: "Lição Atual - Encerramento do Trimestre", pergunta: "Qual o maior ensinamento você tirou deste trimestre?" },
-        { id: 2, tema: "Nova Revista - Introdução ao Livro de Juízes", pergunta: "Por que o ciclo de apostasia se repetia em Juízes?" }
+        { id: 101, tema: "Lição 1: O Livro de Juízes: quando cada um fazia o que parecia certo", pergunta: "O que significa dizer que cada um fazia o que parecia certo aos seus olhos?", status: "concluida" },
+        { id: 102, tema: "Lição 2: Fidelidade a Deus: uma questão de escolha", pergunta: "Qual a lição prática sobre escolhas espirituais aprendemos em Juízes?", status: "aberta" },
+        { id: 103, tema: "Lição 3: Clamor e libertação: a liderança de Otniel", pergunta: "Qual foi o papel de Otniel no clamor do povo?", status: "agendada" }
     ];
     localStorage.setItem('bd_licoes', JSON.stringify(licoesIniciais));
 }
-if (!localStorage.getItem('bd_presenças')) localStorage.setItem('bd_presenças', JSON.stringify([]));
+if (!localStorage.getItem('bd_presenças_v2')) localStorage.setItem('bd_presenças_v2', JSON.stringify({}));
 if (!localStorage.getItem('bd_membros')) localStorage.setItem('bd_membros', JSON.stringify([]));
 if (!localStorage.getItem('bd_respostas')) localStorage.setItem('bd_respostas', JSON.stringify([]));
 
-// --- CONTROLE DE TELAS (AUTENTICAÇÃO) ---
+// --- CONTROLE DE ALTERNÂNCIA DE TELAS ---
 function alternarAbasAuth(queroCadastrar) {
     document.getElementById('auth-login-view').style.display = queroCadastrar ? 'none' : 'block';
     document.getElementById('auth-cadastro-view').style.display = queroCadastrar ? 'block' : 'none';
     fecharAlertas();
 }
 
-// --- VALIDAÇÃO RESTRITA DE NOME COMPLETO ---
+// --- VALIDAÇÃO OBRIGATÓRIA DE NOME COMPLETO ---
 function validarNomeCompleto(nome) {
     const partesNome = nome.trim().split(/\s+/);
     
-    // Regra 1: Tem que ter pelo menos o nome e um sobrenome (mínimo 2 palavras)
+    // Bloqueia nomes curtos ou sem sobrenome
     if (partesNome.length < 2) {
-        return { valido: false, mensagem: "Por favor, insira seu nome COMPLETO (Nome e Sobrenome). Não são permitidos nomes únicos." };
+        return { valido: false, mensagem: "Por favor, insira seu nome COMPLETO (Nome e Sobrenome). Não são permitidos nomes curtos." };
     }
 
-    // Regra 2: Bloquear abreviações terminadas em ponto ou com apenas 1 ou 2 letras isoladas (Ex: "Luis G.", "L. Gustavo")
+    // Identifica e barra abreviações vulgares ou com pontos
     const possuiAbreviacao = partesNome.some(parte => {
         return parte.includes('.') || (parte.length <= 2 && !["da", "de", "do", "das", "dos"].includes(parte.toLowerCase()));
     });
 
     if (possuiAbreviacao) {
-        return { valido: false, mensagem: "Não utilize abreviações ou pontos. Digite seus sobrenomes por extenso." };
+        return { valido: false, mensagem: "Não utilize abreviações ou pontos. Digite seus sobrenomes completos por extenso." };
     }
 
     return { valido: true };
@@ -57,41 +57,43 @@ function verificarSeEhProfessor(nome) {
     return LISTA_PROFESSORES.some(p => p.trim().toLowerCase() === nome.trim().toLowerCase());
 }
 
-// --- FLUXO DE CADASTRO ---
+function obterCargoUsuario(nome) {
+    return verificarSeEhProfessor(nome) ? 'professor' : 'aluno';
+}
+
+// --- PROCESSOS DE CADASTRO ---
 function executarCadastro() {
     const nomeInput = document.getElementById('cadastro-nome').value.trim();
-    if (!nomeInput) { return mostrarAlerta('cadastro-alert', 'Por favor, insira seu nome.'); }
+    if (!nomeInput) return mostrarAlerta('cadastro-alert', 'Por favor, insira seu nome.');
 
-    // Aplica a nova validação rígida de segurança
     const validacao = validarNomeCompleto(nomeInput);
-    if (!validacao.valido) {
-        return mostrarAlerta('cadastro-alert', validacao.mensagem);
-    }
+    if (!validacao.valido) return mostrarAlerta('cadastro-alert', validacao.mensagem);
 
-    let membros = JSON.parse(localStorage.getItem('bd_membros'));
+    let membros = JSON.parse(localStorage.getItem('bd_membros')) || [];
     if (membros.some(m => m.nome.toLowerCase() === nomeInput.toLowerCase())) {
-        return mostrarAlerta('cadastro-alert', 'Este nome já se encontra registrado no portal.');
+        return mostrarAlerta('cadastro-alert', 'Este nome já está cadastrado no sistema.');
     }
 
-    const ehProf = verificarSeEhProfessor(nomeInput);
-    const novoMembro = { nome: nomeInput, cargo: ehProf ? "Líder/Professor" : "Aluno" };
+    const cargo = obterCargoUsuario(nomeInput);
+    const novoMembro = { nome: nomeInput, cargo: cargo === 'professor' ? "Líder/Professor" : "Aluno" };
+    
     membros.push(novoMembro);
     localStorage.setItem('bd_membros', JSON.stringify(membros));
 
     localStorage.setItem('usuarioLogado', novoMembro.nome);
-    localStorage.setItem('perfil', ehProf ? 'professor' : 'aluno');
+    localStorage.setItem('perfil', cargo);
     iniciarSessao();
 }
 
-// --- FLUXO DE LOGIN ---
+// --- PROCESSOS DE LOGIN ---
 function executarLogin() {
     const nomeInput = document.getElementById('login-nome').value.trim();
-    if (!nomeInput) { return mostrarAlerta('login-alert', 'Por favor, informe seu nome.'); }
+    if (!nomeInput) return mostrarAlerta('login-alert', 'Por favor, informe seu nome.');
 
-    let membros = JSON.parse(localStorage.getItem('bd_membros'));
+    let membros = JSON.parse(localStorage.getItem('bd_membros')) || [];
     let usuario = membros.find(m => m.nome.toLowerCase() === nomeInput.toLowerCase());
 
-    // Auto-cadastro para professores da lista oficial que entrarem pela primeira vez
+    // Auto-cadastro para líderes oficiais ausentes do banco inicial
     if (!usuario && verificarSeEhProfessor(nomeInput)) {
         usuario = { nome: nomeInput, cargo: "Líder/Professor" };
         membros.push(usuario);
@@ -99,7 +101,7 @@ function executarLogin() {
     }
 
     if (!usuario) {
-        return mostrarAlerta('login-alert', 'Nome não localizado. Se você é um aluno novo, clique em "Cadastre-se aqui" logo abaixo.');
+        return mostrarAlerta('login-alert', 'Nome não localizado. Se você for aluno, clique em "Cadastre-se aqui" abaixo.');
     }
 
     localStorage.setItem('usuarioLogado', usuario.nome);
@@ -107,7 +109,7 @@ function executarLogin() {
     iniciarSessao();
 }
 
-// --- SESSÃO ATIVA & RENDERIZAÇÃO DIRECIONADA ---
+// --- GERENCIAMENTO DE INTERFACES ATIVAS ---
 function iniciarSessao() {
     const nome = localStorage.getItem('usuarioLogado');
     const perfil = localStorage.getItem('perfil');
@@ -128,200 +130,215 @@ function iniciarSessao() {
     listarMembrosNaTela();
 }
 
-// --- CONSTRUTOR DINÂMICO DE PORTAL (ALUNO VS PROFESSOR) ---
 function construirDashboardDinamico() {
     const container = document.getElementById('dashboard-dinamico-conteudo');
     const perfil = localStorage.getItem('perfil');
-    const nomeUser = localStorage.getItem('usuarioLogado');
-
-    const presencas = JSON.parse(localStorage.getItem('bd_presenças'));
-    const totalAlunosPresentes = presencas.length;
-    const porcentagemTurma = ((totalAlunosPresentes / TOTAL_ALUNOS_META) * 100).toFixed(0);
+    
+    const licoes = JSON.parse(localStorage.getItem('bd_licoes')) || [];
+    const licaoAbertaHoje = licoes.find(l => l.status === 'aberta');
+    const dPresenças = JSON.parse(localStorage.getItem('bd_presenças_v2')) || {};
+    
+    let totalPresentesHoje = 0;
+    if (licaoAbertaHoje && dPresenças[licaoAbertaHoje.id]) {
+        totalPresentesHoje = dPresenças[licaoAbertaHoje.id].length;
+    }
+    const porcentagemTurma = ((totalPresentesHoje / TOTAL_ALUNOS_META) * 100).toFixed(0);
 
     if (perfil === 'professor') {
         container.innerHTML = `
             <div class="col-esquerda">
                 <div class="card card-admin-action">
-                    <h2>⚙️ Painel de Comando</h2>
-                    <p style="margin-bottom:1rem;">Olá Líder, use as abas do menu superior para inserir matérias ou analisar a lista completa de presença dos alunos.</p>
-                    <button class="btn-principal" onclick="navegarPara('tela-licoes')">Ir para Área de Postagens</button>
-                </div>
-            </div>
-            <div class="col-direita">
-                <div class="card">
-                    <h2>📊 Frequência em Tempo Real (Turma)</h2>
-                    <p>Meta Fixa da Sala: <strong>${TOTAL_ALUNOS_META} Alunos</strong> (Professores não alteram a métrica).</p>
-                    <div class="metric-container">
-                        <div class="metric-bar" style="width: ${porcentagemTurma}%"></div>
-                        <div class="metric-text">${porcentagemTurma}% (${totalAlunosPresentes} de ${TOTAL_ALUNOS_META})</div>
+                    <h2>⚙️ Painel de Gestão da EBD</h2>
+                    <p>Olá, Professor! Use as abas superiores para navegar. Na aba <strong>"Cronograma & Chamadas"</strong> você pode abrir, fechar ou agendar lições.</p>
+                    <div style="margin-top:1.5rem; background:#fff; padding:1rem; border-radius:6px; border:1px solid #e2e8f0;">
+                        <strong>Frequência da Aula Ativa Hoje:</strong> ${porcentagemTurma}% (${totalPresentesHoje} de ${TOTAL_ALUNOS_META} Alunos)
+                        <div class="metric-container"><div class="metric-bar" style="width: ${porcentagemTurma}%"></div></div>
                     </div>
                 </div>
-            </div>
-        `;
+            </div>`;
     } else {
-        const jaDeuPresenca = presencas.includes(nomeUser);
-        const frequenciaPessoal = jaDeuPresenca ? "100%" : "0%";
-
         container.innerHTML = `
             <div class="col-esquerda">
-                <div class="card card-presenca-hoje">
-                    <h2>📍 Chamada Eletrônica</h2>
-                    <p>Confirme que você está assistindo à aula do grupo <strong>Luz Eterna</strong> de hoje.</p>
-                    <button id="btn-marcar-presenca" class="btn-presence" ${jaDeuPresenca ? 'disabled' : ''} onclick="marcarPresencaAluno()">
-                        ${jaDeuPresenca ? '✅ PRESENÇA CONFIRMADA' : 'MARCAR MINHA PRESENÇA'}
-                    </button>
-                </div>
-            </div>
-            <div class="col-direita">
                 <div class="card">
-                    <h2>📊 Meu Aproveitamento</h2>
-                    <p>Sua assiduidade registrada no sistema neste domingo:</p>
-                    <div class="metric-container">
-                        <div class="metric-bar" style="width: ${frequenciaPessoal}"></div>
-                        <div class="metric-text">${frequenciaPessoal} de Presença</div>
-                    </div>
+                    <h2>📍 Central do Aluno - Luz Eterna</h2>
+                    <p>Fique atento! A chamada do dia e as perguntas estão concentradas no menu <strong style="color:var(--azul-medio); text-decoration:underline; cursor:pointer;" onclick="navegarPara('tela-licoes')">"Cronograma & Chamadas"</strong>.</p>
                 </div>
-            </div>
-        `;
+            </div>`;
     }
 }
 
-// --- REGRAS DE PRESENÇA DOS ALUNOS ---
-function marcarPresencaAluno() {
-    const nome = localStorage.getItem('usuarioLogado');
-    const perfil = localStorage.getItem('perfil');
-
-    if (perfil === 'professor') {
-        alert('Líderes e Professores possuem presença automática e permanente, não alterando a meta de alunos.');
-        return;
-    }
-
-    let presencas = JSON.parse(localStorage.getItem('bd_presenças'));
-    if (!presencas.includes(nome)) {
-        presencas.push(nome);
-        localStorage.setItem('bd_presenças', JSON.stringify(presencas));
-    }
-
-    construirDashboardDinamico();
-    mostrarAlerta('dashboard-alert', 'Presença computada com sucesso na classe Luz Eterna!');
-}
-
-// --- CRIAÇÃO DE CONTEÚDO (PROFESSOR INSERE) ---
+// --- PUBLICAÇÕES DE LIÇÕES ---
 function publicarNovaLicao() {
     const tema = document.getElementById('post-tema').value.trim();
     const pergunta = document.getElementById('post-pergunta').value.trim();
+    const status = document.getElementById('post-status').value;
 
     if (!tema || !pergunta) {
-        alert('Por favor, preencha o tema e a pergunta da atividade.');
+        alert('Por favor, defina o tema e a pergunta do exercício.');
         return;
     }
 
-    let licoes = JSON.parse(localStorage.getItem('bd_licoes'));
-    const nova = { id: Date.now(), tema: tema, pergunta: pergunta };
+    let licoes = JSON.parse(localStorage.getItem('bd_licoes')) || [];
+    const nova = { id: Date.now(), tema: tema, pergunta: pergunta, status: status };
     licoes.unshift(nova);
 
     localStorage.setItem('bd_licoes', JSON.stringify(licoes));
-    
     document.getElementById('post-tema').value = '';
     document.getElementById('post-pergunta').value = '';
 
-    alert('Lição e Atividade publicadas com sucesso!');
+    alert('Nova aula inserida no cronograma com sucesso!');
     atualizarFeedLicoes();
+    construirDashboardDinamico();
 }
 
-// --- RENDERIZAR LIÇÕES E ATIVIDADES ---
+function alterarStatusAula(licaoId, novoStatus) {
+    let licoes = JSON.parse(localStorage.getItem('bd_licoes')) || [];
+    licoes = licoes.map(l => {
+        if (l.id === licaoId) l.status = novoStatus;
+        return l;
+    });
+    localStorage.setItem('bd_licoes', JSON.stringify(licoes));
+    atualizarFeedLicoes();
+    construirDashboardDinamico();
+}
+
+// --- CONSTRUTOR DO FEED COM BLOQUEIOS DE STATUS ---
 function atualizarFeedLicoes() {
     const feed = document.getElementById('feed-licoes');
-    const licoes = JSON.parse(localStorage.getItem('bd_licoes'));
+    const licoes = JSON.parse(localStorage.getItem('bd_licoes')) || [];
     const perfil = localStorage.getItem('perfil');
     const nomeUser = localStorage.getItem('usuarioLogado');
-    const respostas = JSON.parse(localStorage.getItem('bd_respostas'));
+    const dPresenças = JSON.parse(localStorage.getItem('bd_presenças_v2')) || {};
+    const respostas = JSON.parse(localStorage.getItem('bd_respostas')) || [];
 
     if (licoes.length === 0) {
-        feed.innerHTML = '<p>Nenhuma matéria cadastrada ainda.</p>';
+        feed.innerHTML = '<p>Nenhuma lição agendada no momento.</p>';
         return;
     }
 
     feed.innerHTML = '';
+
     licoes.forEach(licao => {
+        const listaPresencasDessaLicao = dPresenças[licao.id] || [];
+        const jaDeuPresenca = listaPresencasDessaLicao.includes(nomeUser);
         const jaRespondeu = respostas.some(r => r.licaoId === licao.id && r.aluno === nomeUser);
 
-        let areaInteracao = '';
-        if (perfil === 'aluno') {
-            areaInteracao = jaRespondeu 
-                ? `<p style="color:var(--sucesso); font-weight:bold; margin-top:0.5rem;">✅ Você já enviou sua resposta para esta atividade.</p>`
-                : `<div class="atividade-box" id="box-${licao.id}">
-                    <p><strong>Atividade:</strong> ${licao.pergunta}</p>
-                    <input type="text" id="input-${licao.id}" placeholder="Escreva sua resposta aqui...">
-                    <button onclick="enviarRespostaAluno(${licao.id})">Enviar</button>
-                   </div>`;
-        } else {
-            const respostasDaLicao = respostas.filter(r => r.licaoId === licao.id);
-            let listaRespostasProf = '';
-            respostasDaLicao.forEach(r => {
-                listaRespostasProf += `<p style="font-size:0.85rem; border-top:1px dashed #ccc; padding-top:4px;"><strong>${r.aluno}:</strong> ${r.texto}</p>`;
-            });
+        let selStatusClass = `status-${licao.status}`;
+        let statusTexto = licao.status === 'agendada' ? '📅 Agendada' : (licao.status === 'aberta' ? '🔓 Aberta para Hoje' : '🔒 Concluída');
 
-            areaInteracao = `<div class="atividade-box">
-                <p><strong>Pergunta Ativa:</strong> ${licao.pergunta}</p>
-                <div style="margin-top:0.5rem; background:white; padding:0.5rem; border-radius:4px;">
-                    <span style="font-size:0.8rem; font-weight:bold; color:var(--azul-medio);">Respostas dos Alunos (${respostasDaLicao.length}):</span>
-                    ${listaRespostasProf || '<p style="font-size:0.8rem; color:gray;">Nenhuma resposta enviada ainda.</p>'}
-                </div>
-               </div>`;
+        let controleProfessor = '';
+        if (perfil === 'professor') {
+            controleProfessor = `
+                <div style="margin-top: 12px; border-top: 1px dashed #ddd; padding-top: 8px;">
+                    <span style="font-size:0.8rem; font-weight:bold; color:#777; display:block; margin-bottom:5px;">Ações do Professor:</span>
+                    ${licao.status !== 'aberta' ? `<button class="btn-acao-aula btn-abrir" onclick="alterarStatusAula(${licao.id}, 'aberta')">Liberar Chamada</button>` : ''}
+                    ${licao.status !== 'concluida' ? `<button class="btn-acao-aula btn-fechar" onclick="alterarStatusAula(${licao.id}, 'concluida')">Encerrar Aula</button>` : ''}
+                    ${licao.status !== 'agendada' ? `<button class="btn-acao-aula" style="background:#7f8c8d;" onclick="alterarStatusAula(${licao.id}, 'agendada')">Bloquear/Agendar</button>` : ''}
+                </div>`;
+        }
+
+        let areaInteracao = '';
+        if (licao.status === 'agendada') {
+            areaInteracao = `
+                <div class="atividade-box" style="border-left-color: var(--alerta); background: #fff9f5;">
+                    <p style="color: var(--alerta); font-weight:bold;">⚠️ Presença Bloqueada</p>
+                    <p style="font-size: 0.85rem; color: #666; margin-top:4px;">Esta aula está cadastrada para o futuro. A chamada eletrônica e o exercício associado só estarão abertos no respectivo domingo.</p>
+                </div>`;
+        } else if (licao.status === 'aberta') {
+            if (perfil === 'aluno') {
+                areaInteracao = `
+                    <div class="atividade-box" style="border-left-color: var(--sucesso);">
+                        <p style="margin-bottom:0.5rem; font-weight:bold;">📍 Controle de Chamada:</p>
+                        <button class="btn-principal" style="background:var(--sucesso); color:white;" ${jaDeuPresenca ? 'disabled' : ''} onclick="marcarPresencaV2(${licao.id})">
+                            ${jaDeuPresenca ? '✅ SUA PRESENÇA FOI COMPUTADA NESTA AULA' : 'Clique aqui para Confirmar Presença'}
+                        </button>
+                        <hr style="border:0; border-top:1px solid #ccc; margin:1rem 0;">
+                        <p><strong>📝 Exercício da Lição:</strong> ${licao.pergunta}</p>
+                        ${jaRespondeu ? '<p style="color:var(--sucesso); font-weight:bold; margin-top:5px;">✅ Resposta enviada com sucesso!</p>' : `
+                            <div style="margin-top: 0.5rem; display: flex; gap: 10px;">
+                                <input type="text" id="input-${licao.id}" placeholder="Digite sua resposta por extenso..." style="flex: 1; padding: 0.5rem; border-radius:4px; border:1px solid #ccc;">
+                                <button onclick="enviarRespostaV2(${licao.id})" style="padding:0.5rem 1rem; background:var(--azul-escuro); color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">Enviar</button>
+                            </div>
+                        `}
+                    </div>`;
+            } else {
+                const respDaLicao = respostas.filter(r => r.licaoId === licao.id);
+                let listagem = respDaLicao.map(r => `<p style="font-size:0.85rem; border-top:1px dashed #ddd; padding:4px 0;"><strong>${r.aluno}:</strong> ${r.texto}</p>`).join('');
+                areaInteracao = `
+                    <div class="atividade-box">
+                        <p><strong>Alunos Presentes hoje (${listaPresencasDessaLicao.length}):</strong> ${listaPresencasDessaLicao.join(', ') || 'Nenhum aluno registrou presença.'}</p>
+                        <div style="margin-top:0.8rem; background:white; padding:0.5rem; border:1px solid #ddd; border-radius:4px;">
+                            <strong>Exercícios respondidos (${respDaLicao.length}):</strong>
+                            <div style="max-height:120px; overflow-y:auto; margin-top:4px;">${listagem || 'Sem respostas enviadas.'}</div>
+                        </div>
+                    </div>`;
+            }
+        } else if (licao.status === 'concluida') {
+            const respDaLicao = respostas.filter(r => r.licaoId === licao.id);
+            let listagem = respDaLicao.map(r => `<p style="font-size:0.85rem; border-top:1px dashed #ddd; padding:4px 0;"><strong>${r.aluno}:</strong> ${r.texto}</p>`).join('');
+            areaInteracao = `
+                <div class="atividade-box" style="border-left-color: #7f8c8d; background: #f9f9f9;">
+                    <p style="color:#555; font-weight:bold;">🔒 Aula Concluída</p>
+                    <p style="font-size:0.85rem; margin-bottom:5px;"><strong>Total Final de Alunos Presentes:</strong> ${listaPresencasDessaLicao.length}</p>
+                    <div style="background:white; padding:0.5rem; border:1px solid #ddd; border-radius:4px; font-size:0.85rem;">
+                        <strong>Histórico de Respostas dos Alunos:</strong>
+                        <div>${listagem || 'Sem respostas registradas para esta aula.'}</div>
+                    </div>
+                </div>`;
         }
 
         feed.innerHTML += `
-            <div class="licao-timeline-item">
-                <h3>${licao.tema}</h3>
+            <div class="licao-timeline-item" style="background: white; border: 1px solid #e2e8f0; padding: 1.5rem; border-radius: 8px; margin-bottom:1.5rem;">
+                <span class="status-indicator ${selStatusClass}">${statusTexto}</span>
+                <h3 style="margin-top:5px; color:var(--azul-escuro); font-size:1.2rem;">${licao.tema}</h3>
                 ${areaInteracao}
+                ${controleProfessor}
             </div>
         `;
     });
 }
 
-// --- SUBMISSÃO DE ATIVIDADES PELO ALUNO ---
-function enviarRespostaAluno(licaoId) {
+function marcarPresencaV2(licaoId) {
+    const nome = localStorage.getItem('usuarioLogado');
+    let dPresenças = JSON.parse(localStorage.getItem('bd_presenças_v2')) || {};
+    if (!dPresenças[licaoId]) dPresenças[licaoId] = [];
+
+    if (!dPresenças[licaoId].includes(nome)) {
+        dPresenças[licaoId].push(nome);
+        localStorage.setItem('bd_presenças_v2', JSON.stringify(dPresenças));
+        alert('Sua presença foi salva com sucesso nesta lição!');
+        atualizarFeedLicoes();
+        construirDashboardDinamico();
+    }
+}
+
+function enviarRespostaV2(licaoId) {
     const input = document.getElementById(`input-${licaoId}`);
-    const respostaTexto = input.value.trim();
+    const texto = input.value.trim();
     const nomeUser = localStorage.getItem('usuarioLogado');
 
-    if (!respostaTexto) {
-        alert('Escreva uma resposta válida antes de enviar.');
-        return;
-    }
+    if (!texto) return alert('Por favor, preencha o campo de texto antes de submeter.');
 
-    let respostas = JSON.parse(localStorage.getItem('bd_respostas'));
-    respostas.push({ licaoId: licaoId, aluno: nomeUser, texto: respostaTexto });
+    let respostas = JSON.parse(localStorage.getItem('bd_respostas')) || [];
+    respostas.push({ licaoId: licaoId, aluno: nomeUser, texto: texto });
     localStorage.setItem('bd_respostas', JSON.stringify(respostas));
 
-    alert('Sua atividade foi registrada pelo professor!');
+    alert('Exercício enviado com sucesso para análise do líder!');
     atualizarFeedLicoes();
 }
 
-// --- LISTA DE MEMBROS ---
 function listarMembrosNaTela() {
     const container = document.getElementById('lista-oficial-membros');
-    const membros = JSON.parse(localStorage.getItem('bd_membros'));
-
-    if (membros.length === 0) {
-        container.innerHTML = '<p>Nenhum membro cadastrado nesta rede local.</p>';
-        return;
-    }
-
+    const membros = JSON.parse(localStorage.getItem('bd_membros')) || [];
+    if (membros.length === 0) { container.innerHTML = '<p>Nenhum membro registrado na rede.</p>'; return; }
     container.innerHTML = '';
     membros.forEach(m => {
         const classeBadge = m.cargo === 'Líder/Professor' ? 'role-professor' : 'role-aluno';
-        container.innerHTML += `
-            <div class="membro-row">
-                <span class="membro-name">${m.nome}</span>
-                <span class="membro-badge ${classeBadge}">${m.cargo}</span>
-            </div>
-        `;
+        container.innerHTML += `<div class="membro-row"><span>${m.nome}</span><span class="membro-badge ${classeBadge}">${m.cargo}</span></div>`;
     });
 }
 
-// --- ROTINAS AUXILIARES ---
+// --- FUNÇÕES UTILITÁRIAS ---
 function navegarPara(telaId) {
     document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
     document.getElementById(telaId).classList.add('ativa');
@@ -344,9 +361,6 @@ function fazerLogout() {
     window.location.reload();
 }
 
-// Verificação de persistência em recarregamentos de página
 window.onload = () => {
-    if (localStorage.getItem('usuarioLogado')) {
-        iniciarSessao();
-    }
+    if (localStorage.getItem('usuarioLogado')) iniciarSessao();
 };
