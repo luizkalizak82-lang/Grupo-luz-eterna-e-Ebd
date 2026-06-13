@@ -1,1 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal EBD - Jovens Luz Eterna</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo-area">
+                <h1>Luz <span>Eterna</span></h1>
+                <p>Portal da Escola Bíblica Dominical</p>
+            </div>
+            <nav id="nav-principal" style="display: none;">
+                <a onclick="navegarPara('tela-dashboard')">Início</a>
+                <a onclick="navegarPara('tela-licoes')">Matérias do Trimestre</a>
+                <a onclick="navegarPara('tela-membros')">Membros da Classe</a>
+                <div class="user-status-bar">
+                    Olá, <span id="nome-usuario-logado">Usuário</span>
+                    <button class="btn-logout" onclick="fazerLogout()">Sair</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+
+        <section id="tela-auth" class="tela ativa">
+            <div class="auth-container">
+                <div id="auth-login-view">
+                    <h2>Entrar no Portal</h2>
+                    <p class="subtitle">Acesse o conteúdo e marque sua presença</p>
+                    <div id="login-alert" class="alert alert-error" style="display: none;"></div>
+                    <div class="form-group">
+                        <label for="login-nome">Seu Nome Completo</label>
+                        <input type="text" id="login-nome" placeholder="Digite seu nome exatamente como cadastrou">
+                    </div>
+                    <button class="btn-principal" onclick="executarLogin()">Entrar na Classe</button>
+                    <div class="auth-toggle">
+                        Ainda não está na lista? <span onclick="alternarAbasAuth(true)">Cadastre-se aqui</span>
+                    </div>
+                </div>
+
+                <div id="auth-cadastro-view" style="display: none;">
+                    <h2>Criar Cadastro</h2>
+                    <p class="subtitle">Registre-se no grupo de jovens Luz Eterna</p>
+                    <div id="cadastro-alert" class="alert alert-error" style="display: none;"></div>
+                    <div class="form-group">
+                        <label for="cadastro-nome">Nome Completo</label>
+                        <input type="text" id="cadastro-nome" placeholder="Ex: Gabriel Silva Santos">
+                    </div>
+                    <div class="form-group">
+                        <label for="cadastro-funcao">Sua Função na EBD</label>
+                        <select id="cadastro-funcao">
+                            <option value="Aluno">Aluno</option>
+                            <option value="Líder/Professor">Líder / Professor</option>
+                        </select>
+                    </div>
+                    <button class="btn-principal" onclick="executarCadastro()">Confirmar Registro</button>
+                    <div class="auth-toggle">
+                        Já possui cadastro? <span onclick="alternarAbasAuth(false)">Fazer login</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tela-dashboard" class="tela">
+            <div id="dashboard-alert" class="alert alert-success" style="display: none;"></div>
+            <div class="dashboard-grid">
+                <div class="col-esquerda">
+                    <div class="card card-destaque">
+                        <h2>📌 Próximo Estudo Dominical</h2>
+                        <div id="conteudo-proxima-aula" style="margin-top: 1rem;"></div>
+                    </div>
+                    <div class="card card-meta">
+                        <h2>📊 Frequência da Aula Atual (Meta: 42 Alunos)</h2>
+                        <p class="meta-desc">Veja em tempo real o percentual de assiduidade da classe para este domingo:</p>
+                        <div class="metric-container">
+                            <div id="barra-progresso-aula" class="metric-bar"></div>
+                            <div id="texto-progresso-aula" class="metric-text">0% (0 de 42 presentes)</div>
+                        </div>
+                        <p id="insight-presenca"></p>
+                    </div>
+                    <div class="card">
+                        <h2>📚 Resumo do Trimestre</h2>
+                        <p class="resumo-texto">Estamos encerrando o trimestre atual e iniciando uma jornada profunda no <strong>Livro de Juízes</strong>.</p>
+                        <button class="btn-principal btn-auto" onclick="navegarPara('tela-licoes')">Ver Todas as Matérias</button>
+                    </div>
+                </div>
+                <div class="col-direita">
+                    <div class="card card-presenca-hoje">
+                        <h2>📍 Presença de Hoje</h2>
+                        <div class="presence-box">
+                            <p id="presence-date-text"></p>
+                            <p id="presence-theme-text"></p>
+                            <button id="btn-marcar-presenca" class="btn-presence" onclick="marcarPresencaAtual()">CONFIRMAR PRESENÇA</button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h2>🏆 Frequência Individual</h2>
+                        <p class="ranking-desc">Líderes de assiduidade acumulada:</p>
+                        <div id="dashboard-ranking"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tela-licoes" class="tela">
+            <div class="card">
+                <h2>📚 Grade Completa de Matérias do Trimestre</h2>
+                <p class="view-desc">Fique por dentro das datas, temas e leituras programadas para as ministrações.</p>
+                <div class="magazine-title">Revista Atual: Lições Finais do Trimestre</div>
+                <div class="list-lessons" id="lista-revista-atual"></div>
+                <div class="magazine-title">Nova Revista: Fidelidade às Escrituras e Oposição à Apostasia — Lições Espirituais no Livro de Juízes</div>
+                <div class="list-lessons" id="lista-revista-nova"></div>
+            </div>
+        </section>
+
+        <section id="tela-membros" class="tela">
+            <div class="card">
+                <h2>👥 Membros Cadastrados e Controle Geral</h2>
+                <p class="view-desc">Lista oficial do grupo de jovens <strong>Luz Eterna</strong> com acesso ao portal.</p>
+                <div class="membros-list" id="lista-oficial-membros"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Grupo de Jovens Luz Eterna - Escola Bíblica Dominical</p>
+        <p class="footer-sub">Desenvolvido para acompanhamento espiritual, comunhão e assiduidade</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+                              </html>
 
