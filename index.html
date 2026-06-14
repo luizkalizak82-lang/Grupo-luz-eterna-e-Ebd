@@ -66,7 +66,7 @@
                 
                 <div class="form-group">
                     <label>📝 Escolha o Tema ou Assunto</label>
-                    <input type="text" id="post-tema" placeholder="Ex: Lição 3 - Clamor e libertação">
+                    <input type="text" id="post-tema" placeholder="Ex: Teologia da Prosperidade">
                 </div>
                 <div class="form-group">
                     <label>✍️ Exercício / Pergunta da Aula</label>
@@ -79,8 +79,8 @@
                 <div class="form-group">
                     <label>⚡ Estado Inicial do Conteúdo</label>
                     <select id="post-status">
-                        <option value="agendada">📅 Agendada (Bloqueada para o futuro)</option>
                         <option value="aberta">🔓 Aberta para Hoje (Libera chamada imediatamente)</option>
+                        <option value="agendada">📅 Agendada (Bloqueada para o futuro)</option>
                         <option value="concluida">🔒 Concluída / Fechada</option>
                     </select>
                 </div>
@@ -91,7 +91,7 @@
                 <h3 class="card-title-dark">📊 Frequência Geral de Alunos (Classe Juvenil)</h3>
                 <div class="metrics-container">
                     <div class="metric-block">
-                        <span class="metric-value" id="txt-total-meta">50</span>
+                        <span class="metric-value" id="txt-total-meta">0</span>
                         <span class="metric-label">ALUNOS NA META</span>
                     </div>
                     <div class="metric-block">
@@ -140,7 +140,12 @@
         <div id="tela-diario" class="tela">
             <div class="content-card list-card blue-theme">
                 <h3 class="card-title">👥 Diário de Classe: Lista Oficial de Membros</h3>
-                <p class="card-subtitle">Professores e Líderes oficiais possuem permissões administrativas automaticamente.</p>
+                <p class="card-subtitle">Abaixo você confere o total geral da classe e todos os integrantes registrados.</p>
+                
+                <div class="total-membros-badge">
+                    Total Geral de Membros Cadastrados: <strong id="txt-total-membros-diario">0</strong>
+                </div>
+
                 <div id="lista-oficial-membros"></div>
             </div>
         </div>
