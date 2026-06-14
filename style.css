@@ -24,71 +24,17 @@ body {
     padding-bottom: 60px;
 }
 
-.top-nav-bar {
-    background-color: var(--azul-escuro-nav);
-    padding: 12px 10px;
-    text-align: center;
-}
+/* Navegação */
+.top-nav-bar { background-color: var(--azul-escuro-nav); padding: 12px 10px; text-align: center; }
+nav { display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; }
+nav button { background: none; border: none; color: var(--branco-puro); font-size: 0.95rem; font-weight: 500; cursor: pointer; padding: 4px 8px; }
+nav button:hover { color: var(--dourado-tema); }
 
-nav {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
-}
+/* Telas e Cards */
+.tela { display: none; max-width: 520px; margin: 0 auto; padding: 0 15px; }
+.tela.ativa { display: block; }
 
-nav button {
-    background: none;
-    border: none;
-    color: var(--branco-puro);
-    font-size: 0.95rem;
-    font-weight: 500;
-    cursor: pointer;
-    padding: 4px 8px;
-}
-
-nav button:hover {
-    color: var(--dourado-tema);
-}
-
-nav .btn-logout {
-    color: #ff8787;
-    margin-left: 10px;
-}
-
-.brand-header {
-    text-align: center;
-    padding: 25px 10px;
-}
-
-.brand-logo {
-    font-family: 'Great Vibes', cursive;
-    color: var(--dourado-tema);
-    font-size: 3.4rem;
-    font-weight: 400;
-}
-
-.brand-subtitle {
-    font-size: 0.75rem;
-    letter-spacing: 2px;
-    font-weight: bold;
-    color: var(--dourado-tema);
-    margin-top: -6px;
-}
-
-.tela {
-    display: none;
-    max-width: 520px;
-    margin: 0 auto;
-    padding: 0 15px;
-}
-
-.tela.ativa {
-    display: block;
-}
-
-.auth-card {
+.auth-card, .card {
     background: var(--branco-puro);
     border-radius: 12px;
     padding: 30px 20px;
@@ -96,30 +42,6 @@ nav .btn-logout {
     text-align: center;
     margin-top: 20px;
     border-top: 4px solid var(--azul-card-bg);
-}
-
-.auth-card h2 {
-    font-size: 1.4rem;
-    color: var(--texto-escuro);
-    margin-bottom: 5px;
-}
-
-.auth-instruction {
-    font-size: 0.85rem;
-    color: #6c757d;
-    margin-bottom: 20px;
-}
-
-.user-welcome-bar {
-    background: var(--branco-puro);
-    padding: 12px 15px;
-    border-radius: 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
-    margin-bottom: 20px;
-    font-size: 0.95rem;
 }
 
 .content-card {
@@ -131,258 +53,26 @@ nav .btn-logout {
     margin-bottom: 20px;
 }
 
-.content-card.list-card {
-    background-color: var(--branco-puro);
-    color: var(--texto-escuro);
-}
+.card-title { color: var(--dourado-tema); font-size: 1.15rem; margin-bottom: 4px; }
+.card-subtitle { font-size: 0.82rem; color: var(--texto-claro-sub); margin-bottom: 18px; }
 
-.content-card.blue-theme {
-    background-color: var(--azul-card-bg);
-    color: var(--branco-puro);
-}
+/* Formulários e Ações */
+.form-group, .input-group { margin-bottom: 14px; text-align: left; }
+.form-group input, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ced4da; margin-bottom: 10px; }
 
-.card-title {
-    color: var(--dourado-tema);
-    font-size: 1.15rem;
-    margin-bottom: 4px;
-}
+.btn-primary, button { width: 100%; background-color: var(--azul-escuro-nav); color: var(--branco-puro); padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
+.btn-secundario { background-color: #ccc; color: var(--texto-escuro); }
 
-.card-title-dark {
-    color: var(--dourado-tema);
-    font-size: 1.25rem;
-    margin-bottom: 6px;
-}
+/* Gestão de Aulas e Membros */
+.inner-item-box { background: var(--branco-puro); border: 1px solid #e2e8f0; padding: 15px; border-radius: 10px; margin-bottom: 12px; }
+.membro-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.1); }
 
-.card-subtitle {
-    font-size: 0.82rem;
-    color: var(--texto-claro-sub);
-    margin-bottom: 18px;
-    line-height: 1.4;
-}
+/* Novos Controles */
+.control-select { padding: 8px; border-radius: 4px; border: 1px solid #ccc; width: auto !important; margin-right: 5px; }
+.btn-delete-full { background-color: var(--cor-erro); color: white; padding: 8px 12px; border-radius: 4px; border: none; cursor: pointer; font-size: 0.8rem; }
 
-.card-subtitle-dark {
-    font-size: 0.85rem;
-    color: #555555;
-    margin-bottom: 18px;
-    line-height: 1.4;
-}
-
-.form-group, .input-group {
-    margin-bottom: 14px;
-    text-align: left;
-}
-
-.form-group label, .input-group label {
-    display: block;
-    font-size: 0.85rem;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.form-group input, .form-group select, .input-group input {
-    width: 100%;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #ced4da;
-    font-size: 0.95rem;
-    background-color: var(--branco-puro);
-    color: var(--texto-escuro);
-}
-
-.btn-primary, .btn-submit-class {
-    width: 100%;
-    background-color: var(--azul-escuro-nav);
-    color: var(--branco-puro);
-    padding: 12px;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.btn-submit-class {
-    background-color: var(--dourado-tema);
-    color: var(--azul-escuro-nav);
-    margin-top: 5px;
-}
-
-.frequency-card {
-    background-color: var(--branco-puro);
-    color: var(--texto-escuro);
-    text-align: center;
-}
-
-.metrics-container {
-    display: flex;
-    justify-content: space-around;
-    margin: 15px 0;
-}
-
-.metric-block {
-    display: flex;
-    flex-direction: column;
-}
-
-.metric-value {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: var(--azul-card-bg);
-}
-
-.metric-label {
-    font-size: 0.68rem;
-    font-weight: bold;
-    color: #6c757d;
-}
-
-.progress-bar-bg {
-    background-color: #e9ecef;
-    height: 10px;
-    border-radius: 5px;
-    overflow: hidden;
-    margin-top: 8px;
-}
-
-.progress-bar-fill {
-    background-color: var(--azul-card-bg);
-    height: 100%;
-    width: 0%;
-    transition: width 0.4s ease;
-}
-
-.inner-item-box {
-    background: var(--branco-puro);
-    border: 1px solid #e2e8f0;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 12px;
-}
-
-.inner-item-box.aula-aberta-destaque {
-    border: 2px solid var(--cor-sucesso);
-    background-color: #f0fdf4;
-}
-
-.blue-theme .inner-item-box {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.1);
-}
-
-.status-indicator {
-    float: right;
-    font-size: 0.72rem;
-    padding: 3px 8px;
-    border-radius: 4px;
-    color: var(--branco-puro);
-    font-weight: bold;
-}
-.st-concluida { background-color: #6c757d; }
-.st-aberta { background-color: var(--cor-sucesso); }
-.st-agendada { background-color: var(--azul-card-bg); }
-
-.box-action-area {
-    background-color: #ffffff;
-    border: 1px solid #cbd5e1;
-    border-left: 5px solid var(--cor-sucesso);
-    padding: 12px;
-    margin-top: 12px;
-    border-radius: 4px;
-}
-
-.btn-action-trigger {
-    background-color: var(--cor-sucesso);
-    color: white;
-    border: none;
-    padding: 10px 14px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    border-radius: 6px;
-    cursor: pointer;
-    width: 100%;
-    transition: background 0.2s;
-}
-
-.btn-action-trigger:hover {
-    background-color: #146c43;
-}
-
-.adm-control-zone {
-    margin-top: 12px;
-    padding-top: 10px;
-    border-top: 1px dashed #cbd5e1;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    flex-wrap: wrap;
-}
-
-.btn-adm {
-    padding: 5px 10px;
-    font-size: 0.72rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    color: white;
-}
-.btn-adm-open { background-color: var(--cor-sucesso); }
-.btn-adm-schedule { background-color: #ff9f43; }
-.btn-adm-close { background-color: var(--cor-erro); }
-.btn-adm-delete { background-color: var(--cor-erro); margin-left: auto; }
-
-.badge-role {
-    font-size: 0.75rem;
-    font-weight: bold;
-    padding: 3px 10px;
-    border-radius: 12px;
-}
+.badge-role { font-size: 0.75rem; font-weight: bold; padding: 3px 10px; border-radius: 12px; }
 .role-professor { background-color: var(--dourado-tema); color: var(--azul-escuro-nav); }
 .role-aluno { background-color: #e2e8f0; color: var(--texto-escuro); }
 
-.total-membros-badge {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid var(--dourado-tema);
-    padding: 10px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    text-align: center;
-    margin-bottom: 15px;
-    color: #ffffff;
-}
-
-.diario-secao-titulo {
-    font-size: 1rem;
-    color: var(--dourado-tema);
-    margin: 15px 0 8px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.2);
-    padding-bottom: 4px;
-}
-
-.membro-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-.alert {
-    background-color: #f8d7da;
-    color: #842029;
-    padding: 8px;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    margin-bottom: 12px;
-    display: none;
-}
-
-.auth-toggle { font-size: 0.85rem; margin-top: 15px; }
-.auth-toggle a { color: var(--azul-escuro-nav); font-weight: bold; text-decoration: none; }
-
-.main-footer {
-    text-align: center;
-    padding: 25px 10px;
-    font-size: 0.78rem;
-    color: #6c757d;
-}
+.conteudo { display: none; }
