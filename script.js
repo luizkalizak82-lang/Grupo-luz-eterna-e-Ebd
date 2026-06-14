@@ -117,16 +117,15 @@ function normalizarTextoParaBusca(txt) {
 }
 
 // ==========================================================================
-// FUNÇÃO DE LOGIN CORRIGIDA (IGNORA MAIÚSCULAS/MINÚSCULAS)
+// FUNÇÃO DE LOGIN CORRIGIDA (CORREÇÃO DO NOME DA FUNÇÃO)
 // ==========================================================================
-function ejecutarLogin() {
+function executarLogin() {
     const nomeInput = document.getElementById('login-nome').value.trim();
     if (!nomeInput) return mostrarAlerta('login-alert', 'Informe o seu nome.');
 
     let membros = JSON.parse(localStorage.getItem('bd_membros'));
     let nomeBusca = normalizarTextoParaBusca(nomeInput);
     
-    // Agora normaliza tanto a digitação quanto os itens salvos na lista para não haver erro
     let usuario = membros.find(m => normalizarTextoParaBusca(m.nome) === nomeBusca);
 
     if (!usuario) return mostrarAlerta('login-alert', 'Nome não localizado na lista de classe.');
@@ -200,6 +199,10 @@ function atualizarMétricasFrequência() {
     document.getElementById('txt-presentes-hoje').innerText = totalPresentes;
     document.getElementById('txt-porcentagem-hoje').innerText = `${pct}%`;
     document.getElementById('barra-progresso-frequencia').style.width = `${pct}%`;
+}
+
+function publishingNovaLicao() { // Mantida a compatibilidade interna se necessário
+    publicarNovaLicao();
 }
 
 function publicarNovaLicao() {
@@ -288,4 +291,216 @@ function atualizarFeedLicoes() {
         if (licao.isAvulso) return;
 
         const listaPresencas = dPresenças[String(licao.id)] || [];
-        const usuarioJaConfirmou = listaPresencas.includes(nome
+        const usuarioJaConfirmou = listaPresencas.includes(nomeUser);
+
+        let badgeStyle = licao.status === 'agendada' ? 'st-agendada' : (licao.status === 'aberta' ? 'st-aberta' : 'st-concluida');
+        let labelStatus = licao.status === 'agendada' ? '📅 AGENDADA' : (licao.status === 'aberta' ? '🔓 ABERTA PARA PRESENÇA' : '🔒 CONCLUÍDA / FECHADA');
+        let cardExtraClass = licao.status === 'aberta' ? 'aula-aberta-destaque' : '';
+
+        let painelControleAdm = '';
+        if (perfil === 'professor') {
+            painelControleAdm = `
+                <div class="adm-control-zone">
+                    <span style="font-size:0.75rem; color:var(--azul-card-bg); font-weight:bold;">Alterar Status:</span>
+                    <button class="btn-adm btn-adm-open" onclick="mudarStatusLicaoRemoto('${licao.id}', 'aberta')">Abrir</button>
+                    <button class="btn-adm btn-adm-schedule" onclick="mudarStatusLicaoRemoto('${licao.id}', 'agendada')">Agendar</button>
+                    <button class="btn-adm btn-adm-close" onclick="mudarStatusLicaoRemoto('${licao.id}', 'concluida')">Fechar</button>
+                    <button class="btn-adm btn-adm-delete" onclick="deletarLicaoRemoto('${licao.id}')">❌ Excluir Aula</button>
+                </div>`;
+        }
+
+        let areaAcaoChamada = '';
+        if (licao.status === 'aberta') {
+            areaAcaoChamada = `
+                <div class="box-action-area">
+                    <button class="btn-action-trigger" ${usuarioJaConfirmou ? 'style="background:#6c757d;"' : ''} onclick="assinarChamadaEletronica('${licao.id}')">
+                        ${usuarioJaConfirmou ? '✅ SUA PRESENÇA FOI CONFIRMADA' : '🙋‍♂️ CLIQUE AQUI PARA CONFIRMAR PRESENÇA'}
+                    </button>
+                    <div style="margin-top:10px; font-size:0.82rem; color:#212529;">
+                        <strong>Alunos confirmados nesta aula:</strong> 
+                        <span style="color:var(--cor-sucesso); font-weight:bold;">${listaPresencas.length}</span>
+                        <p style="color:#555; font-size:0.78rem; margin-top:3px; font-style:italic;">(${listaPresencas.join(', ') || 'Nenhum registro ainda.'})</p>
+                    </div>
+                </div>`;
+        } else {
+            areaAcaoChamada = `
+                <div style="margin-top:8px; font-size:0.8rem; color:#6c757d;">
+                    <span>Chamada fechada. Histórico de presentes: <strong>${listaPresencas.length}</strong></span>
+                    <p style="font-size:0.75rem; color:#888;">(${listaPresencas.join(', ') || 'Sem presenças registradas'})</p>
+                </div>`;
+        }
+
+        feed.innerHTML += `
+            <div class="inner-item-box ${cardExtraClass}">
+                <span class="status-indicator ${badgeStyle}">${labelStatus}</span>
+                <h4 style="color:var(--azul-card-bg); margin-bottom: 4px; font-size:1.05rem;">${licao.tema}</h4>
+                <p style="font-size:0.82rem; color:#4a5568; margin-bottom:4px;">Nota: <em>${licao.observacao}</em></p>
+                ${areaAcaoChamada}
+                ${painelControleAdm}
+            </div>`;
+    });
+}
+
+function assinarChamadaEletronica(licaoId) {
+    const nome = localStorage.getItem('usuarioLogado');
+    let dPresenças = JSON.parse(localStorage.getItem('bd_presenças_v2')) || {};
+    
+    if (!dPresenças[String(licaoId)]) dPresenças[String(licaoId)] = [];
+
+    if (!dPresenças[String(licaoId)].includes(nome)) {
+        dPresenças[String(licaoId)].push(nome);
+        localStorage.setItem('bd_presenças_v2', JSON.stringify(dPresenças));
+        sincronizarTelasEReatividade();
+    } else {
+        alert('Sua presença já está registrada nesta lição.');
+    }
+}
+
+function publicarExercicioAvulso() {
+    const titulo = document.getElementById('ex-extra-titulo').value.trim();
+    const pregunta = document.getElementById('ex-extra-pergunta').value.trim();
+
+    if (!titulo || !pregunta) {
+        alert('Por favor, preencha o título e o enunciado.');
+        return;
+    }
+
+    let licoes = JSON.parse(localStorage.getItem('bd_licoes')) || [];
+    const novoExAvulso = {
+        id: String(Date.now()),
+        tema: `Atividade: ${titulo}`,
+        pergunta: pregunta,
+        observacao: "Exercício avulso criado pelos líderes.",
+        isAvulso: true,
+        status: "aberta"
+    };
+
+    licoes.unshift(novoExAvulso);
+    localStorage.setItem('bd_licoes', JSON.stringify(licoes));
+
+    document.getElementById('ex-extra-titulo').value = '';
+    document.getElementById('ex-extra-pergunta').value = '';
+
+    alert('Exercício postado com sucesso!');
+    sincronizarTelasEReatividade();
+}
+
+function atualizarAbaExercicios() {
+    const container = document.getElementById('feed-exercicios');
+    if (!container) return;
+
+    const licoes = JSON.parse(localStorage.getItem('bd_licoes')) || [];
+    const respostas = JSON.parse(localStorage.getItem('bd_respostas')) || [];
+    const nomeUser = localStorage.getItem('usuarioLogado');
+
+    const liberados = licoes.filter(l => l.status !== 'agendada' || l.isAvulso);
+
+    if (liberados.length === 0) {
+        container.innerHTML = '<p style="padding:10px; color:#666;">Nenhum exercício disponível no momento.</p>';
+        return;
+    }
+
+    container.innerHTML = '';
+
+    liberados.forEach(licao => {
+        const jaRespondeu = respostas.some(r => String(r.licaoId) === String(licao.id) && r.aluno === nomeUser);
+        const filtradas = respostas.filter(r => String(r.licaoId) === String(licao.id));
+
+        let feedRespostasGerais = '';
+        if (filtradas.length > 0) {
+            let itens = filtradas.map(r => `<p style="font-size:0.8rem; padding:4px 0; border-bottom:1px dashed #e2e8f0;"><strong>✅ ${r.aluno}:</strong> "${r.texto}"</p>`).join('');
+            feedRespostasGerais = `<div style="margin-top:10px; background:#f1f5f9; padding:10px; border-radius:6px; border:1px solid #cbd5e1; color:#333;"><strong>Respostas coletadas:</strong>${itens}</div>`;
+        }
+
+        let interfaceEnvio = '';
+        if (licao.status === 'concluida') {
+            interfaceEnvio = '<p style="color:#6c757d; font-size:0.85rem; margin-top:5px;">🔒 Exercício encerrado.</p>';
+        } else if (jaRespondeu) {
+            interfaceEnvio = '<p style="color:var(--cor-sucesso); font-size:0.85rem; font-weight:bold; margin-top:5px;">✅ Atividade Respondida!</p>';
+        } else {
+            interfaceEnvio = `
+                <div style="margin-top:10px; display:flex; gap:6px;">
+                    <input type="text" id="ipt-${licao.id}" placeholder="Escreva sua resposta aqui..." style="flex:1; padding:8px; font-size:0.9rem;">
+                    <button onclick="enviarExercicio('${licao.id}')" style="padding:8px 15px; background:var(--azul-card-bg); color:white; border:none; cursor:pointer; font-weight:bold; border-radius:6px;">Enviar</button>
+                </div>`;
+        }
+
+        container.innerHTML += `
+            <div class="inner-item-box" style="border-left: 4px solid var(--dourado-tema);">
+                <h4 style="color:var(--azul-card-bg); font-size:0.95rem;">📋 ${licao.tema.includes(' - ') ? licao.tema.split(' - ')[1] : licao.tema}</h4>
+                <p style="font-size:0.88rem; margin-top:5px; background:#f8fafc; padding:8px; border-radius:4px; border:1px solid #edf2f7;"><strong>Pergunta:</strong> ${licao.pergunta}</p>
+                ${interfaceEnvio}
+                ${feedRespostasGerais}
+            </div>`;
+    });
+}
+
+function enviarExercicio(licaoId) {
+    const input = document.getElementById(`ipt-${licaoId}`);
+    if (!input || !input.value.trim()) return alert('Digite uma resposta válida.');
+
+    const nomeUser = localStorage.getItem('usuarioLogado');
+    let respostas = JSON.parse(localStorage.getItem('bd_respostas')) || [];
+
+    respostas.push({ licaoId: String(licaoId), aluno: nomeUser, texto: input.value.trim() });
+    localStorage.setItem('bd_respostas', JSON.stringify(respostas));
+    alert('Resposta salva com sucesso!');
+    sincronizarTelasEReatividade();
+}
+
+function listarMembrosNaTela() {
+    const container = document.getElementById('lista-oficial-membros');
+    if (!container) return;
+
+    const membros = JSON.parse(localStorage.getItem('bd_membros')) || [];
+    document.getElementById('txt-total-membros-diario').innerText = membros.length;
+
+    const lideres = membros.filter(m => m.cargo === 'Líder/Professor');
+    const alunos = membros.filter(m => m.cargo === 'Aluno');
+
+    let htmlGerado = '';
+
+    htmlGerado += `<div class="diario-secao-titulo">👥 Líderes e Professores (${lideres.length})</div>`;
+    lideres.forEach(m => {
+        htmlGerado += `
+            <div class="membro-row">
+                <span>⭐ <strong>${m.nome}</strong></span>
+                <span class="badge-role role-professor">PROFESSOR / LÍDER</span>
+            </div>`;
+    });
+
+    htmlGerado += `<div class="diario-secao-titulo">👨‍🎓 Alunos Integrantes (${alunos.length})</div>`;
+    alunos.forEach(m => {
+        htmlGerado += `
+            <div class="membro-row">
+                <span>👤 ${m.nome}</span>
+                <span class="badge-role role-aluno">ALUNO</span>
+            </div>`;
+    });
+
+    container.innerHTML = htmlGerado;
+}
+
+function navegarPara(telaId) {
+    document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
+    document.getElementById(telaId).classList.add('ativa');
+    fecharAlertas();
+}
+
+function mostrarAlerta(idElemento, msg) {
+    const el = document.getElementById(idElemento);
+    el.innerText = msg;
+    el.style.display = 'block';
+}
+
+function fecharAlertas() { document.querySelectorAll('.alert').forEach(a => a.style.display = 'none'); }
+
+function fazerLogout() {
+    localStorage.removeItem('usuarioLogado');
+    localStorage.removeItem('perfil');
+    window.location.reload();
+}
+
+window.onload = () => {
+    if (localStorage.getItem('usuarioLogado')) iniciarSessao();
+};
