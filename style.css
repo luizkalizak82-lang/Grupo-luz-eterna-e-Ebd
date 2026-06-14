@@ -1,228 +1,327 @@
 /* ==========================================================================
-   ESTILIZAÇÃO VISUAL: PORTAL EBD JOVENS (PALETA AZUL & DOURADO)
+   ESTILIZAÇÃO ORIGINAL LUZ ETERNA: FUNDO BRANCO, LETRAS DOURADAS E DETALHES AZUIS
    ========================================================================== */
 
 :root {
-    --azul-escuro: #0f172a;
-    --azul-medio: #1e293b;
-    --azul-claro: #334155;
-    --dourado: #d4af37;
-    --dourado-claro: #f3e5ab;
-    --texto-branco: #f8fafc;
+    --azul-escuro: #0a1931;
+    --azul-claro: #15305b;
+    --dourado: #c5a847;
+    --dourado-claro: #f4edd2;
+    --fundo-site: #f7f9fa;
+    --branco-puro: #ffffff;
+    --texto-escuro: #1c2434;
     --sucesso: #10b981;
-    --alerta: #f59e0b;
-    --erro: #ef4444;
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', Arial, sans-serif;
 }
 
 body {
-    background-color: var(--azul-escuro);
-    color: var(--texto-branco);
-    padding-bottom: 60px;
+    background-color: var(--fundo-site);
+    color: var(--texto-escuro);
 }
 
-/* Telas de Exibição */
-.tela {
-    display: none;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-.tela.ativa {
-    display: block;
-}
-
-/* Containers e Cards */
-.auth-container {
-    background-color: var(--azul-medio);
-    max-width: 420px;
-    margin: 80px auto;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(212, 175, 55, 0.1);
-}
-
-.card, .card-metricas {
-    background-color: var(--azul-medio);
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
-
-/* Formulários e Inputs */
-.input-group {
-    margin-bottom: 15px;
-    display: flex;
-    flex-direction: column;
-}
-
-.input-group label {
-    font-size: 0.9rem;
-    margin-bottom: 5px;
-    color: var(--dourado-claro);
-}
-
-.input-group input, .input-group textarea, .input-group select {
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid var(--azul-claro);
+/* Header e Logotipo Original */
+.main-header {
     background-color: var(--azul-escuro);
     color: white;
-    font-size: 1rem;
+    text-align: center;
+    padding: 20px 10px;
+    border-bottom: 4px solid var(--dourado);
 }
 
-.input-group input:focus, .input-group select:focus {
-    outline: none;
-    border-color: var(--dourado);
+.brand-logo {
+    font-family: 'Great Vibes', cursive;
+    color: var(--dourado);
+    font-size: 3.2rem;
+    font-weight: 400;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
 }
 
-/* Botões */
-.btn-principal {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 6px;
-    background-color: var(--azul-claro);
-    color: white;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.btn-principal:hover {
-    filter: brightness(1.2);
-}
-
-.btn-principal:disabled {
-    background-color: #475569;
-    color: #94a3b8;
-    cursor: not-allowed;
-}
-
-.btn-acao-aula {
-    padding: 6px 12px;
+.brand-subtitle {
     font-size: 0.8rem;
-    border: none;
-    border-radius: 4px;
-    color: white;
-    margin-right: 5px;
-    margin-top: 5px;
-    cursor: pointer;
+    letter-spacing: 2px;
     font-weight: bold;
+    color: var(--branco-puro);
+    margin-top: -5px;
 }
-.btn-abrir { background-color: var(--sucesso); color: var(--azul-escuro); }
-.btn-fechar { background-color: var(--erro); }
 
-/* Menu de Navegação */
+/* Menu Superior Exatamente em Cima */
 nav {
-    background-color: var(--azul-medio);
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
     display: flex;
-    justify-content: space-around;
-    padding: 10px 0;
-    border-top: 2px solid var(--dourado);
-    z-index: 1000;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
+    flex-wrap: wrap;
 }
 
 nav button {
-    background: none;
+    background: transparent;
     border: none;
-    color: white;
-    font-size: 0.9rem;
+    color: var(--branco-puro);
+    font-size: 0.95rem;
+    font-weight: 600;
     cursor: pointer;
-    font-weight: bold;
     padding: 5px 10px;
+    transition: color 0.2s;
 }
 
 nav button:hover {
     color: var(--dourado);
 }
 
-.btn-logout {
-    color: var(--erro);
+nav .btn-logout {
+    color: #ff6b6b;
 }
 
-/* Badges e Status */
+/* Telas */
+.tela {
+    display: none;
+    max-width: 650px;
+    margin: 25px auto;
+    padding: 0 15px;
+}
+
+.tela.ativa {
+    display: block;
+}
+
+/* Tela de Login Estilo Original */
+.auth-container {
+    background: var(--branco-puro);
+    padding: 30px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    border-top: 5px solid var(--azul-escuro);
+    margin-top: 40px;
+    text-align: center;
+}
+
+.auth-container h3 {
+    font-size: 1.4rem;
+    color: var(--azul-escuro);
+    margin-bottom: 5px;
+}
+
+.auth-container .instrucao {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    margin-bottom: 20px;
+}
+
+.input-group {
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: var(--azul-escuro);
+    display: block;
+    margin-bottom: 5px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.btn-entrar {
+    width: 100%;
+    background-color: var(--azul-escuro);
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+/* Card Diário de Classe Azul Original */
+.diario-container-card {
+    background-color: var(--azul-escuro);
+    color: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.diario-container-card h3 {
+    color: var(--dourado);
+    font-size: 1.3rem;
+    margin-bottom: 5px;
+}
+
+.sub-painel {
+    font-size: 0.85rem;
+    color: #b3c5ef;
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+.membro-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
 .badge-role {
-    display: inline-block;
-    padding: 4px 8px;
+    padding: 3px 8px;
     font-size: 0.75rem;
     font-weight: bold;
     border-radius: 4px;
-    margin-top: 5px;
 }
 .role-professor { background-color: var(--dourado); color: var(--azul-escuro); }
 .role-aluno { background-color: var(--azul-claro); color: white; }
 
-.status-indicator {
-    display: inline-block;
+/* Boas Vindas */
+.boas-vindas-box {
+    background: var(--branco-puro);
+    padding: 15px;
+    border-radius: 6px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Painel de Controle de Cadastro de Lição */
+.card-painel-professor {
+    background: var(--branco-puro);
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    border-left: 5px solid var(--dourado);
+}
+
+.card-painel-professor h3 { color: var(--azul-escuro); font-size: 1.15rem; }
+.card-painel-professor .sub-painel { color: #555; }
+
+.form-group {
+    margin-bottom: 12px;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.btn-publicar {
+    width: 100%;
+    background-color: var(--dourado);
+    color: var(--azul-escuro);
+    border: none;
+    padding: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-top: 5px;
+}
+
+/* Card Frequência */
+.card-frequencia {
+    background: var(--branco-puro);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.metricas-grid {
+    display: flex;
+    justify-content: space-around;
+    margin: 15px 0;
+}
+
+.metrica-item strong { font-size: 1.6rem; color: var(--azul-escuro); display: block; }
+.metrica-item .lbl { font-size: 0.7rem; font-weight: bold; color: #7f8c8d; }
+
+.progress-bar-bg { background: #e2e8f0; height: 10px; border-radius: 5px; overflow: hidden; }
+.progress-bar-fill { background: var(--azul-escuro); height: 100%; width: 0%; transition: width 0.4s; }
+
+/* Boxes do Feed de Lições e Exercícios */
+.box-licao {
+    background: var(--branco-puro);
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.04);
+    border-top: 4px solid var(--azul-claro);
+}
+
+.status-badge {
+    float: right;
     font-size: 0.75rem;
     padding: 2px 6px;
     border-radius: 4px;
+    color: white;
     font-weight: bold;
-    float: right;
 }
-.status-agendada { background-color: var(--azul-claro); }
-.status-aberta { background-color: var(--sucesso); color: var(--azul-escuro); }
-.status-concluida { background-color: #475569; }
+.bg-concluida { background-color: #7f8c8d; }
+.bg-aberta { background-color: var(--sucesso); }
+.bg-agendada { background-color: var(--azul-claro); }
 
-/* Barras de Progresso */
-.barra-progresso-container {
-    background-color: var(--azul-escuro);
-    border-radius: 10px;
-    height: 12px;
-    width: 100%;
-    overflow: hidden;
-    margin-top: 8px;
-}
-
-.barra-progresso {
-    background-color: var(--sucesso);
-    height: 100%;
-    width: 0%;
-    transition: width 0.4s ease;
-}
-
-/* Caixas de Atividades Internas */
-.atividade-box {
-    background: rgba(15, 23, 42, 0.6);
-    padding: 12px;
+.box-atividade-interna {
+    background: #f8fafc;
+    padding: 15px;
     border-radius: 6px;
-    margin-top: 10px;
-    border-left: 4px solid var(--azul-claro);
+    margin-top: 12px;
+    border-left: 4px solid var(--dourado);
 }
 
-.alert {
-    background-color: rgba(239, 68, 68, 0.2);
-    color: #fca5a5;
-    padding: 8px;
+.btn-chamada {
+    background: var(--sucesso);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    font-weight: bold;
     border-radius: 4px;
-    font-size: 0.85rem;
+    cursor: pointer;
     margin-bottom: 10px;
-    display: none;
-    border: 1px solid var(--erro);
 }
 
-.auth-toggle {
-    text-align: center;
+/* Alertas e Extras */
+.alert {
+    background: #fde8e8;
+    color: #e53e3e;
     font-size: 0.85rem;
-    margin-top: 15px;
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    display: none;
 }
 
-.auth-toggle a {
-    color: var(--dourado);
-    text-decoration: none;
+.auth-toggle { font-size: 0.85rem; margin-top: 10px; }
+.auth-toggle a { color: var(--azul-escuro); font-weight: bold; }
+
+.footer-copy {
+    text-align: center;
+    padding: 20px;
+    font-size: 0.8rem;
+    color: #7f8c8d;
 }
