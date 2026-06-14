@@ -1,6 +1,3 @@
-/* ==========================================================================
-   PALETA RECONFIGURADA: CARDS AZUIS COM LETRAS DOURADAS E TOPO BRANCO
-   ========================================================================== */
 :root {
     --azul-escuro: #0B1B3D;
     --azul-medio: #162E5C;
@@ -28,9 +25,6 @@ body {
     flex-direction: column;
 }
 
-/* ==========================================================================
-   CABECALHO INVERTIDO: FUNDO BRANCO COM LETRAS AZUIS E ABAS DOURADAS
-   ========================================================================== */
 header {
     background-color: var(--branco);
     color: var(--azul-escuro);
@@ -54,7 +48,6 @@ header {
     font-size: 4.5rem;
     color: var(--azul-escuro);
     font-weight: 400;
-    margin-bottom: 0.1rem;
 }
 
 .logo-area-central p {
@@ -74,23 +67,9 @@ nav {
     padding-bottom: 0.8rem;
 }
 
-.nav-links {
-    display: flex;
-    gap: 1.5rem;
-}
-
-nav a {
-    color: var(--azul-escuro);
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: color 0.2s;
-}
-
-nav a:hover {
-    color: var(--dourado);
-}
+.nav-links { display: flex; gap: 1.5rem; }
+nav a { color: var(--azul-escuro); text-decoration: none; font-weight: 700; font-size: 0.95rem; cursor: pointer; }
+nav a:hover { color: var(--dourado); }
 
 .user-status-bar {
     background-color: var(--azul-escuro);
@@ -104,41 +83,13 @@ nav a:hover {
     gap: 0.8rem;
 }
 
-#nome-usuario-logado {
-    color: var(--dourado-claro);
-    font-weight: bold;
-}
-
-.badge-role {
-    font-size: 0.75rem;
-    padding: 0.1rem 0.5rem;
-    border-radius: 10px;
-    font-weight: bold;
-    text-transform: uppercase;
-}
+#nome-usuario-logado { color: var(--dourado-claro); font-weight: bold; }
+.badge-role { font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 10px; font-weight: bold; text-transform: uppercase; }
 .role-professor { background-color: var(--dourado); color: var(--azul-escuro); }
-.role-aluno { background-color: #7f8c8d; color: var(--branco); }
+.role-aluno { background-color: #34495e; color: var(--branco); border: 1px solid rgba(255,255,255,0.2); }
+.btn-logout { background: none; border: none; color: #ff7675; cursor: pointer; font-weight: bold; text-decoration: underline; }
 
-.btn-logout {
-    background: none;
-    border: none;
-    color: #ff7675;
-    cursor: pointer;
-    font-weight: bold;
-    text-decoration: underline;
-}
-
-/* ==========================================================================
-   ESTILOS DE TELAS VISUAIS (CARDS AZUIS COM TEXTO DOURADO)
-   ========================================================================== */
-main {
-    flex: 1;
-    max-width: 1200px;
-    width: 100%;
-    margin: 2rem auto;
-    padding: 0 1.5rem;
-}
-
+main { flex: 1; max-width: 1200px; width: 100%; margin: 2rem auto; padding: 0 1.5rem; }
 .tela { display: none; }
 .tela.ativa { display: block; animation: subidaSuave 0.3s ease-in-out; }
 
@@ -147,7 +98,6 @@ main {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Alteração Solicitada: Fundo Azul Escuro e Letras Douradas nos Cards */
 .card {
     background-color: var(--azul-escuro);
     color: var(--dourado-claro);
@@ -158,95 +108,30 @@ main {
     border: 1px solid rgba(212, 175, 55, 0.3);
 }
 
-.card h2 {
-    font-size: 1.4rem;
-    color: var(--dourado);
-    margin-bottom: 1.2rem;
-    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-    padding-bottom: 0.5rem;
-}
+.card h2 { font-size: 1.4rem; color: var(--dourado); margin-bottom: 1.2rem; border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 0.5rem; }
+.card-admin-action { border: 2px solid var(--dourado); background-color: var(--azul-medio); }
 
-.card-admin-action {
-    border: 2px solid var(--dourado);
-    background-color: var(--azul-medio);
-}
-
-/* Componentes de Formulários */
 .form-group { margin-bottom: 1.25rem; }
 .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.9rem; color: var(--dourado); }
-.form-group input, .select-custom {
-    width: 100%;
-    padding: 0.8rem 1rem;
-    border: 1px solid var(--dourado);
-    background-color: var(--azul-escuro);
-    color: var(--branco);
-    border-radius: 6px;
-    font-size: 0.95rem;
-    outline: none;
-}
-.form-group input::placeholder { color: #8a9bb8; }
+.form-group input, .select-custom { width: 100%; padding: 0.8rem 1rem; border: 1px solid var(--dourado); background-color: var(--azul-escuro); color: var(--branco); border-radius: 6px; outline: none; }
 
-.btn-principal {
-    width: 100%;
-    background-color: var(--dourado);
-    color: var(--azul-escuro);
-    border: none;
-    padding: 0.9rem;
-    font-size: 1rem;
-    font-weight: 700;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.2s;
-    text-transform: uppercase;
-}
+.btn-principal { width: 100%; background-color: var(--dourado); color: var(--azul-escuro); border: none; padding: 0.9rem; font-size: 1rem; font-weight: 700; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
 .btn-principal:hover { background-color: var(--dourado-claro); }
+.btn-principal:disabled { background-color: #27ae60 !important; color: white !important; cursor: not-allowed; opacity: 0.9; }
 
-/* Bloco Interno de Atividades */
-.atividade-box {
-    background-color: var(--azul-medio);
-    padding: 1.2rem;
-    border-radius: 8px;
-    margin-top: 1rem;
-    border-left: 5px solid var(--dourado);
-    color: var(--branco);
-}
+.atividade-box { background-color: var(--azul-medio); padding: 1.2rem; border-radius: 8px; margin-top: 1rem; border-left: 5px solid var(--dourado); color: var(--branco); }
+.atividade-box input[type="text"] { flex: 1; padding: 0.6rem; border: 1px solid var(--dourado); background: var(--azul-escuro); color: white; border-radius: 4px; outline: none; }
 
-/* Indicadores de Status das Lições */
-.status-indicator {
-    display: inline-block;
-    padding: 0.3rem 0.7rem;
-    font-size: 0.75rem;
-    font-weight: bold;
-    border-radius: 4px;
-    text-transform: uppercase;
-    margin-bottom: 0.6rem;
-}
+.status-indicator { display: inline-block; padding: 0.3rem 0.7rem; font-size: 0.75rem; font-weight: bold; border-radius: 4px; text-transform: uppercase; margin-bottom: 0.6rem; }
 .status-agendada { background-color: #2980b9; color: var(--branco); }
 .status-aberta { background-color: var(--sucesso); color: var(--azul-escuro); }
 .status-concluida { background-color: #7f8c8d; color: var(--branco); }
 
-.btn-acao-aula {
-    padding: 0.5rem 1rem;
-    font-size: 0.8rem;
-    font-weight: bold;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
-    color: var(--azul-escuro);
-    margin-right: 5px;
-    margin-top: 5px;
-}
+.btn-acao-aula { padding: 0.5rem 1rem; font-size: 0.8rem; font-weight: bold; border-radius: 4px; border: none; cursor: pointer; color: var(--azul-escuro); margin-right: 5px; margin-top: 5px; }
 .btn-abrir { background-color: var(--sucesso); }
 .btn-fechar { background-color: var(--alerta); color: white; }
 
-/* Estrutura Separada de Métricas de Frequência */
-.metricas-flex-grid {
-    display: flex;
-    justify-content: space-around;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    text-align: center;
-}
+.metricas-flex-grid { display: flex; justify-content: space-around; gap: 1rem; margin-bottom: 1rem; text-align: center; }
 .metrica-item { background: var(--azul-medio); padding: 1rem; border-radius: 8px; flex: 1; border: 1px solid rgba(212, 175, 55, 0.1); }
 .metrica-num { display: block; font-size: 2rem; font-weight: bold; color: var(--dourado); }
 .metrica-lbl { font-size: 0.8rem; color: var(--dourado-claro); text-transform: uppercase; }
@@ -260,10 +145,8 @@ main {
 
 .alert { padding: 0.8rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.9rem; font-weight: 600; text-align: center; }
 .alert-error { background-color: #5c1d16; color: #fcc2bc; border: 1px solid var(--erro); }
-.alert-success { background-color: #164a29; color: #bcfcd2; border: 1px solid var(--sucesso); }
 
 footer { background-color: var(--branco); color: var(--azul-escuro); text-align: center; padding: 1.5rem; font-size: 0.85rem; margin-top: auto; border-top: 4px solid var(--dourado); font-weight: 600; }
-.footer-sub { color: var(--cinza-texto); font-size: 0.75rem; margin-top: 0.2rem; }
 
 @media (max-width: 768px) {
     .logo-area-central h1 { font-size: 3rem; }
