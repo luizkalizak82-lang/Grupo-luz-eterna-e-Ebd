@@ -1,27 +1,26 @@
 // ==========================================================================
-// ARQUIVO LÓGICO COMPLETO: MAPEAMENTO DE PERMISSÕES, CALENDÁRIO E OBSERVAÇÕES
+// ARQUIVO LÓGICO COMPLETO: PERMISSÕES, CALENDÁRIO, PRESENÇAS E MEMBROS VIRTUAIS
 // ==========================================================================
 
-// Lista oficial com nomes exatos e tolerância ampla a erros de digitação (ignora maiúsculas/minúsculas)
+// Lista oficial com as variações do seu nome para o sistema te reconhecer como administrador
 const LISTA_LIDERES_E_PROFESSORES = [
-    "luiz gustavo machado kalizak", 
+    "luiz kalizak", 
     "michael", 
     "eclair", 
     "júnior", 
     "junior", 
     "débora",
-    "debora"
+    "debora",
+    "luiz gustavo machado kalizak"
 ];
 
-const METRICAS_CLASSE_TOTAL = 50; // Quantidade de alunos meta fixada no painel
+const METRICAS_CLASSE_TOTAL = 50; // Meta fixa de 50 alunos
 
 // Gerador automático de Domingos do ano letivo de 2026 para preencher a plataforma
 function gerarListaDomingos2026() {
     let domingos = [];
-    // Data base: Primeiro Domingo de Julho de 2026 (Início do 3º Trimestre refletido na revista)
-    let dataFoco = new Date(2026, 6, 5); // 5 de Julho de 2026
+    let dataFoco = new Date(2026, 6, 5); // 5 de Julho de 2026 (Início do 3º Trimestre)
     
-    // Títulos sequenciais da revista fornecida na imagem do usuário
     const temasRevista = [
         "Lição 1: O Livro de Juízes: quando cada um fazia o que parecia certo",
         "Lição 2: Fidelidade a Deus: uma questão de escolha",
@@ -38,7 +37,7 @@ function gerarListaDomingos2026() {
         "Lição 13: Esperança em meio ao caos: aguardando a vinda do rei"
     ];
 
-    for (let i = 0; i < 22; i++) { // Cobre os domingos até o final do ano
+    for (let i = 0; i < 22; i++) {
         let diaStr = String(dataFoco.getDate()).padStart(2, '0');
         let mesStr = String(dataFoco.getMonth() + 1).padStart(2, '0');
         let dataFormatada = `${diaStr}/${mesStr}/${dataFoco.getFullYear()}`;
@@ -51,10 +50,9 @@ function gerarListaDomingos2026() {
             tema: `${dataFormatada} - ${temaPadrao}`,
             pergunta: "Quais lições práticas e espirituais você absorveu na ministração de hoje?",
             observacao: "Nenhuma anotação extra realizada pelos professores.",
-            status: i === 0 ? "concluida" : (i === 1 ? "aberta" : "agendada") // Inicializa as primeiras abertas/concluídas
+            status: i === 0 ? "concluida" : (i === 1 ? "aberta" : "agendada")
         });
         
-        // Avança 7 dias para o próximo domingo
         dataFoco.setDate(dataFoco.getDate() + 7);
     }
     return domingos;
@@ -74,7 +72,6 @@ function alternarAbasAuth(queroCadastrar) {
     fecharAlertas();
 }
 
-// Tratamento rigoroso de caracteres para evitar falhas com acentos e maiúsculas
 function normalizarTextoParaBusca(txt) {
     return txt.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
@@ -89,7 +86,7 @@ function executarCadastro() {
     if (!nomeInput) return mostrarAlerta('cadastro-alert', 'Por favor, digite seu nome completo.');
 
     if (nomeInput.split(/\s+/).length < 2) {
-        return mostrarAlerta('cadastro-alert', 'Digite nome e sobrenome por extenso para validação da ata.');
+        return mostrarAlerta('cadastro-alert', 'Digite nome e sobrenome por extenso.');
     }
 
     let membros = JSON.parse(localStorage.getItem('bd_membros')) || [];
@@ -115,7 +112,6 @@ function executarLogin() {
     let membros = JSON.parse(localStorage.getItem('bd_membros')) || [];
     let usuario = membros.find(m => m.nome.toLowerCase() === nomeInput.toLowerCase());
 
-    // Auto-inserção de professores para evitar barreiras de acesso iniciais
     if (!usuario && verificarSeEhProfessor(nomeInput)) {
         usuario = { nome: nomeInput, cargo: "Líder/Professor" };
         membros.push(usuario);
@@ -123,7 +119,8 @@ function executarLogin() {
     }
 
     if (!usuario) {
-        return mostrarAlerta('login-alert', 'Nome não localizado. Se você for um aluno novo, faça seu cadastro primeiro.');
+        // Se for um aluno que digitou o nome direto sem se cadastrar antes
+        return mostrarAlerta('login-alert', 'Nome não localizado. Mude para a aba "Cadastre-se aqui" abaixo.');
     }
 
     localStorage.setItem('usuarioLogado', usuario.nome);
@@ -145,7 +142,6 @@ function iniciarSessao() {
     document.getElementById('tela-auth').classList.remove('ativa');
     document.getElementById('tela-dashboard').classList.add('ativa');
 
-    // Libera o painel de escrita de matérias exclusivamente se for líder/professor
     document.getElementById('painel-cadastro-licao').style.display = perfil === 'professor' ? 'block' : 'none';
 
     atualizarMétricasFrequência();
@@ -153,12 +149,9 @@ function iniciarSessao() {
     listarMembrosNaTela();
 }
 
-// --- SISTEMA DINÂMICO DE ATUALIZAÇÃO DA PORCENTAGEM DE PRESENÇAS ---
 function atualizarMétricasFrequência() {
     const licoes = JSON.parse(localStorage.getItem('bd_licoes')) || [];
     const dPresenças = JSON.parse(localStorage.getItem('bd_presenças_v2')) || {};
-    
-    // Localiza a lição que está ativa/aberta no domingo corrente
     const licaoAtiva = licoes.find(l => l.status === 'aberta') || licoes[0];
     
     let totalPresentes = 0;
@@ -169,22 +162,20 @@ function atualizarMétricasFrequência() {
     let pct = ((totalPresentes / METRICAS_CLASSE_TOTAL) * 100).toFixed(0);
     if (pct > 100) pct = 100;
 
-    // Atualiza os elementos de texto injetados na tela separada
     document.getElementById('txt-meta-alunos').innerText = METRICAS_CLASSE_TOTAL;
     document.getElementById('txt-presentes-hoje').innerText = totalPresentes;
     document.getElementById('txt-porcentagem-hoje').innerText = `${pct}%`;
     document.getElementById('barra-progresso-frequencia').style.width = `${pct}%`;
 }
 
-// --- POSTAGEM DE NOVAS MATÉRIAS PELO PROFESSOR ---
 function publicarNovaLicao() {
     const tema = document.getElementById('post-tema').value.trim();
-    const pergunta = document.getElementById('post-pergunta').value.trim();
+    const perguntaInput = document.getElementById('post-pergunta').value.trim();
     const observacao = document.getElementById('post-observacao').value.trim() || "Nenhuma anotação extra.";
     const status = document.getElementById('post-status').value;
 
-    if (!tema || !pergunta) {
-        alert('Por favor, informe pelo menos o Tema da aula e a Pergunta de fixação.');
+    if (!tema || !perguntaInput) {
+        alert('Por favor, informe o Tema da aula e a Pergunta de fixação.');
         return;
     }
 
@@ -192,20 +183,19 @@ function publicarNovaLicao() {
     const novaAula = {
         id: Date.now(),
         tema: tema,
-        pergunta: pergunta,
+        pergunta: perguntaInput,
         observacao: observacao,
         status: status
     };
 
-    licoes.unshift(novaAula); // Insere no topo da linha cronológica
+    licoes.unshift(novaAula);
     localStorage.setItem('bd_licoes', JSON.stringify(licoes));
     
-    // Reseta os inputs
     document.getElementById('post-tema').value = '';
     document.getElementById('post-pergunta').value = '';
     document.getElementById('post-observacao').value = '';
 
-    alert('Aula e anotações gravadas e postadas com sucesso!');
+    alert('Aula postada com sucesso!');
     atualizarFeedLicoes();
     atualizarMétricasFrequência();
 }
@@ -221,7 +211,6 @@ function mudarStatusLicaoRemoto(licaoId, novoStatus) {
     atualizarMétricasFrequência();
 }
 
-// --- CONSTRUTOR DE INTEGRAÇÃO DO FEED (CRONOGRAMA DE ESTUDOS) ---
 function atualizarFeedLicoes() {
     const feed = document.getElementById('feed-licoes');
     const licoes = JSON.parse(localStorage.getItem('bd_licoes')) || [];
@@ -244,6 +233,7 @@ function atualizarFeedLicoes() {
 
         let badgeClass = `status-${licao.status}`;
         let labelStatus = licao.status === 'agendada' ? '📅 Agendada' : (licao.status === 'aberta' ? '🔓 Aberta para Hoje' : '🔒 Concluída');
+        let perguntaDefinida = licao.pergunta || "Responda o que compreendeu da aula de hoje.";
 
         let painelAcoesProfessor = '';
         if (perfil === 'professor') {
@@ -261,48 +251,46 @@ function atualizarFeedLicoes() {
             interfaceConteudoEstudo = `
                 <div class="atividade-box" style="border-left-color: var(--alerta);">
                     <p style="color: var(--dourado); font-weight: bold;">📅 Estudo Bloqueado / Futuro</p>
-                    <p style="font-size: 0.85rem; margin-top:4px; color:#edf2f7;">O conteúdo programático e a chamada eletrônica correspondentes a este assunto serão destravados pelos coordenadores no respectivo domingo de aula.</p>
+                    <p style="font-size: 0.85rem; margin-top:4px; color:#edf2f7;">O conteúdo programático e a chamada eletrônica serão destravados pelos coordenadores no respectivo domingo.</p>
                 </div>`;
         } else if (licao.status === 'aberta') {
-            if (perfil === 'aluno') {
-                interfaceConteudoEstudo = `
-                    <div class="atividade-box" style="border-left-color: var(--sucesso);">
-                        <p style="font-weight: bold; margin-bottom: 5px;">Ata de Presença Dominical:</p>
-                        <button class="btn-principal" style="background-color: var(--sucesso); color: var(--azul-escuro); margin-bottom: 1rem;" ${alunoJaDeuPresenca ? 'disabled' : ''} onclick="assinarChamadaEletronica(${licao.id})">
-                            ${alunoJaDeuPresenca ? '✅ SUA PRESENÇA FOI COMPUTADA NO DIÁRIO DE CLASSE' : 'Assinar Lista de Presenças Virtual'}
-                        </button>
-                        <p style="margin-top:10px;"><strong>✍️ Exercício Interativo:</strong> ${licao.pergunta}</p>
-                        ${alunoJaRespondeu ? '<p style="color: var(--dourado); font-weight:bold; margin-top:5px;">✅ Sua resposta foi enviada aos professores.</p>' : `
-                            <div style="margin-top:0.5rem; display:flex; gap:8px;">
-                                <input type="text" id="ipt-${licao.id}" placeholder="Escreva seu ponto de vista ou resposta...">
-                                <button class="btn-principal" style="width:auto; padding: 0.5rem 1rem;" onclick="submeterRespostaAluno(${licao.id})">Enviar</button>
-                            </div>
-                        `}
-                    </div>`;
-            } else {
-                // Visão unificada do Professor na aula corrente
-                const filtrarRespostas = respostas.filter(r => r.licaoId === licao.id);
-                let listaRender = filtrarRespostas.map(r => `<p style="font-size:0.85rem; padding:3px 0; border-bottom:1px dashed rgba(255,255,255,0.05)"><strong>${r.aluno}:</strong> ${r.texto}</p>`).join('');
-                interfaceConteudoEstudo = `
-                    <div class="atividade-box">
-                        <p><strong>Anotações Internas do Líder:</strong> <span style="font-style:italic; color:var(--dourado-claro);">${licao.observacao}</span></p>
-                        <p style="margin-top:5px;"><strong>Alunos na Lista de Presença (${listaPresencas.length}):</strong> ${listaPresencas.join(', ') || 'Nenhum aluno registrou entrada ainda.'}</p>
-                        <div style="background: rgba(0,0,0,0.2); padding: 0.6rem; border-radius: 4px; margin-top: 8px;">
-                            <strong>Respostas dos Alunos (${filtrarRespostas.length}):</strong>
-                            <div style="max-height: 100px; overflow-y:auto; margin-top:4px;">${listaRender || 'Sem respostas submetidas.'}</div>
+            // Ambos os perfis visualizam a mesma estrutura interativa dinâmica agora
+            const filtrarRespostas = respostas.filter(r => r.licaoId === licao.id);
+            let listaRender = filtrarRespostas.map(r => `<p style="font-size:0.85rem; padding:3px 0; border-bottom:1px dashed rgba(255,255,255,0.05)"><strong>${r.aluno}:</strong> ${r.texto}</p>`).join('');
+
+            interfaceConteudoEstudo = `
+                <div class="atividade-box" style="border-left-color: var(--sucesso);">
+                    <p style="font-weight: bold; margin-bottom: 5px;">Ata de Presença Dominical:</p>
+                    <button class="btn-principal" style="background-color: var(--sucesso); color: var(--azul-escuro); margin-bottom: 1rem;" ${alunoJaDeuPresenca ? 'disabled' : ''} onclick="assinarChamadaEletronica(${licao.id})">
+                        ${alunoJaDeuPresenca ? '✅ SUA PRESENÇA FOI COMPUTADA NO DIÁRIO DE CLASSE' : 'Assinar Lista de Presenças Virtual'}
+                    </button>
+                    
+                    <p style="margin-top:10px;"><strong>✍️ Exercício Interativo:</strong> ${perguntaDefinida}</p>
+                    ${alunoJaRespondeu ? '<p style="color: var(--dourado); font-weight:bold; margin-top:5px;">✅ Sua resposta foi enviada aos professores.</p>' : `
+                        <div style="margin-top:0.5rem; display:flex; gap:8px; margin-bottom:15px;">
+                            <input type="text" id="ipt-${licao.id}" placeholder="Escreva seu ponto de vista ou resposta...">
+                            <button class="btn-principal" style="width:auto; padding: 0.5rem 1rem;" onclick="submeterRespostaAluno(${licao.id})">Enviar</button>
                         </div>
-                    </div>`;
-            }
+                    `}
+                    
+                    <div style="background: rgba(0,0,0,0.25); padding: 0.7rem; border-radius: 6px; margin-top: 10px; border: 1px solid rgba(212,175,55,0.1);">
+                        <p style="font-size:0.85rem; color:var(--dourado);"><strong>Alunos Confirmados Nesta Aula (${listaPresencas.length}):</strong></p>
+                        <p style="font-size:0.85rem; color:white; margin-bottom:8px;">${listaPresencas.join(', ') || 'Ninguém assinou ainda.'}</p>
+                        
+                        <p style="font-size:0.85rem; color:var(--dourado);"><strong>Respostas da Classe (${filtrarRespostas.length}):</strong></p>
+                        <div style="max-height: 120px; overflow-y:auto; margin-top:4px;">${listaRender || '<span style="font-size:0.8rem; color:#aaa;">Aguardando submissões...</span>'}</div>
+                    </div>
+                </div>`;
         } else if (licao.status === 'concluida') {
             const filtrarRespostas = respostas.filter(r => r.licaoId === licao.id);
             let listaRender = filtrarRespostas.map(r => `<p style="font-size:0.85rem; padding:2px 0;"><strong>${r.aluno}:</strong> ${r.texto}</p>`).join('');
             interfaceConteudoEstudo = `
                 <div class="atividade-box" style="border-left-color: #7f8c8d; background-color:#1c315e;">
                     <p style="color: #bdc3c7; font-weight: bold;">🔒 Histórico Arquivado e Fechado</p>
-                    <p style="font-size:0.85rem;"><strong>Total de Frequência Computada:</strong> ${listaPresencas.length} alunos presentes.</p>
-                    <p style="font-size:0.85rem; color:var(--dourado-claro);"><strong>Observações Técnicas:</strong> ${licao.observacao}</p>
+                    <p style="font-size:0.85rem; margin-bottom: 4px;"><strong>Exercício Aplicado:</strong> ${perguntaDefinida}</p>
+                    <p style="font-size:0.85rem;"><strong>Total de Frequência Computada:</strong> ${listaPresencas.length} alunos.</p>
                     <div style="font-size:0.8rem; border-top: 1px solid rgba(212,175,55,0.1); margin-top:5px; padding-top:4px;">
-                        <strong>Respostas Gravadas no Relatório:</strong>
+                        <strong>Respostas Gravadas:</strong>
                         <div>${listaRender || 'Nenhuma atividade anexada.'}</div>
                     </div>
                 </div>`;
@@ -327,7 +315,7 @@ function assinarChamadaEletronica(licaoId) {
     if (!dPresenças[licaoId].includes(nome)) {
         dPresenças[licaoId].push(nome);
         localStorage.setItem('bd_presenças_v2', JSON.stringify(dPresenças));
-        alert('Presença computada e salva no diário de chamada!');
+        alert('Presença confirmada no diário!');
         atualizarFeedLicoes();
         atualizarMétricasFrequência();
     }
@@ -338,24 +326,34 @@ function submeterRespostaAluno(licaoId) {
     const texto = inputElement.value.trim();
     const nome = localStorage.getItem('usuarioLogado');
 
-    if (!texto) return alert('Por favor, redija uma resposta antes de submeter.');
+    if (!texto) return alert('Por favor, escreva uma resposta.');
 
     let respostas = JSON.parse(localStorage.getItem('bd_respostas')) || [];
     respostas.push({ licaoId: licaoId, aluno: nome, texto: texto });
     localStorage.setItem('bd_respostas', JSON.stringify(respostas));
 
-    alert('Sua resposta foi anexada aos relatórios da liderança.');
+    alert('Atividade enviada com sucesso!');
     atualizarFeedLicoes();
 }
 
+// ATUALIZADO: Lista exibe todos os cadastrados de forma limpa e em tempo real para alunos e líderes
 function listarMembrosNaTela() {
     const container = document.getElementById('lista-oficial-membros');
     const membros = JSON.parse(localStorage.getItem('bd_membros')) || [];
-    if (membros.length === 0) { container.innerHTML = '<p>Nenhum aluno registrado nas atas.</p>'; return; }
+    
+    if (membros.length === 0) { 
+        container.innerHTML = '<p style="color:var(--dourado-claro); padding:10px;">Nenhum participante cadastrado no sistema ainda.</p>'; 
+        return; 
+    }
+    
     container.innerHTML = '';
     membros.forEach(m => {
         const classeBadge = m.cargo === 'Líder/Professor' ? 'role-professor' : 'role-aluno';
-        container.innerHTML += `<div class="membro-row" style="color:white;"><span>${m.nome}</span><span class="membro-badge ${classeBadge}">${m.cargo}</span></div>`;
+        container.innerHTML += `
+            <div class="membro-row" style="color:white; display:flex; justify-content:between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(212,175,55,0.1);">
+                <span>👤 ${m.nome}</span>
+                <span class="badge-role ${classeBadge}">${m.cargo}</span>
+            </div>`;
     });
 }
 
@@ -379,7 +377,6 @@ function fazerLogout() {
     window.location.reload();
 }
 
-// Inicia automaticamente o ecossistema na tela ao ler o documento
 window.onload = () => {
     if (localStorage.getItem('usuarioLogado')) iniciarSessao();
 };
