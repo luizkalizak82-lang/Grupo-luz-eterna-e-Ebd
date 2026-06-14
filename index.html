@@ -5,31 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal EBD - Jovens Luz Eterna</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Fonte Cursiva para o Logotipo Luz Eterna -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <!-- BARRA DE NAVEGAÇÃO SUPERIOR -->
     <div class="top-nav-bar">
         <nav id="nav-principal" style="display: none;">
-            <button onclick="navegarPara('tela-dashboard')">Início</button>
-            <button onclick="navegarPara('tela-dashboard')">Cronograma EBD</button>
+            <button onclick="navegarPara('tela-dashboard')">Início / Cronograma</button>
             <button onclick="navegarPara('tela-exercicios')">Exercícios</button>
             <button onclick="navegarPara('tela-diario')">Diário de Classe</button>
             <button class="btn-logout" onclick="fazerLogout()">Sair</button>
         </nav>
     </div>
 
-    <!-- CABEÇALHO LOGOTIPO -->
     <header class="brand-header">
         <h1 class="brand-logo">Luz Eterna</h1>
         <p class="brand-subtitle">PORTAL DA ESCOLA BÍBLICA DOMINICAL</p>
     </header>
 
-    <!-- TELA DE AUTENTICAÇÃO (LOGIN) -->
     <div id="tela-auth" class="tela ativa">
         <div class="auth-card">
             <h2>Entrar no Portal</h2>
@@ -57,20 +52,17 @@
         </div>
     </div>
 
-    <!-- CONTEÚDO PRINCIPAL -->
     <main class="main-container">
         
-        <!-- TELA: CRONOGRAMA & INÍCIO -->
         <div id="tela-dashboard" class="tela">
             <div class="user-welcome-bar">
                 <span>Olá, <strong id="nome-usuario-logado">-</strong></span>
                 <span id="badge-perfil" class="badge-role">ALUNO</span>
             </div>
 
-            <!-- PAINEL DE CADASTRO DE LIÇÃO (LÍDERES) -->
             <div id="painel-cadastro-licao" class="content-card" style="display: none;">
                 <h3 class="card-title">📝 Gerenciamento de Aulas: Inserir Conteúdo Dominical</h3>
-                <p class="card-subtitle">Use esta área para publicar o tema da aula, perguntas reflexivas e as anotações do diário de classe.</p>
+                <p class="card-subtitle">Publique o tema da aula e escolha se ela iniciará aberta para chamada ou agendada.</p>
                 
                 <div class="form-group">
                     <label>📝 Escolha o Tema ou Assunto</label>
@@ -87,20 +79,19 @@
                 <div class="form-group">
                     <label>⚡ Estado Inicial do Conteúdo</label>
                     <select id="post-status">
-                        <option value="aberta">🔓 Aberta para Hoje (Libera chamada)</option>
                         <option value="agendada">📅 Agendada (Bloqueada para o futuro)</option>
+                        <option value="aberta">🔓 Aberta para Hoje (Libera chamada imediatamente)</option>
                         <option value="concluida">🔒 Concluída / Fechada</option>
                     </select>
                 </div>
                 <button class="btn-submit-class" onclick="publicarNovaLicao()">🚀 PUBLICAR AULA NA PLATAFORMA</button>
             </div>
 
-            <!-- PAINEL DE FREQUÊNCIA DA CLASSE -->
             <div class="content-card frequency-card">
                 <h3 class="card-title-dark">📊 Frequência Geral de Alunos (Classe Juvenil)</h3>
                 <div class="metrics-container">
                     <div class="metric-block">
-                        <span class="metric-value">50</span>
+                        <span class="metric-value" id="txt-total-meta">50</span>
                         <span class="metric-label">ALUNOS NA META</span>
                     </div>
                     <div class="metric-block">
@@ -117,17 +108,14 @@
                 </div>
             </div>
 
-            <!-- CRONOGRAMA OFICIAL -->
             <div class="content-card list-card">
-                <h3 class="card-title-dark">📅 Cronograma Oficial e Registro de Matérias</h3>
-                <p class="card-subtitle-dark">As lições programadas aparecem listadas abaixo. A chamada fica restrita às aulas marcadas como "Aberta para Hoje".</p>
+                <h3 class="card-title-dark">📅 Cronograma Oficial e Chamada</h3>
+                <p class="card-subtitle-dark">Abaixo você confere o cronograma completo. Assim que o professor colocar uma aula como <strong>"Aberta"</strong>, o botão de confirmar presença surgirá para os alunos.</p>
                 <div id="feed-licoes"></div>
             </div>
         </div>
 
-        <!-- TELA: EXERCÍCIOS DE FIXAÇÃO -->
         <div id="tela-exercicios" class="tela">
-            <!-- Criador de Exercícios Isolados (Visível apenas para Líderes) -->
             <div id="painel-criar-exercicio-extra" class="content-card" style="display: none; background-color: var(--azul-card-bg); color: white;">
                 <h3 class="card-title">✍️ Criar Nova Pergunta / Exercício Avulso</h3>
                 <p class="card-subtitle">Formule perguntas extras para coletar a opinião e fixação dos alunos.</p>
@@ -149,7 +137,6 @@
             </div>
         </div>
 
-        <!-- TELA: DIÁRIO DE CLASSE -->
         <div id="tela-diario" class="tela">
             <div class="content-card list-card blue-theme">
                 <h3 class="card-title">👥 Diário de Classe: Lista Oficial de Membros</h3>
