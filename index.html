@@ -7,29 +7,38 @@
 </head>
 <body>
     <div id="tela-auth" class="tela ativa">
-        <div class="card-login">
+        <div class="card">
             <h2>Portal EBD - Luz Eterna</h2>
             <input type="text" id="login-nome" placeholder="Seu Nome Completo">
             <button onclick="executarLogin()">Entrar</button>
+            <button onclick="mostrarTela('tela-cadastro')" class="btn-secundario">Cadastrar Novo Aluno</button>
+        </div>
+    </div>
+
+    <div id="tela-cadastro" class="tela" style="display:none;">
+        <div class="card">
+            <h2>Novo Cadastro</h2>
+            <input type="text" id="novo-nome" placeholder="Nome Completo">
+            <button onclick="cadastrarAluno()">Confirmar Cadastro</button>
+            <button onclick="mostrarTela('tela-auth')" class="btn-secundario">Voltar</button>
         </div>
     </div>
 
     <div id="tela-dashboard" class="tela" style="display:none;">
         <nav>
-            <button onclick="navegar('cronograma')">Cronograma EBD</button>
-            <button onclick="navegar('diario')">Diário de Classe</button>
+            <button onclick="mudarConteudo('cronograma')">Cronograma</button>
+            <button onclick="mudarConteudo('diario')">Diário</button>
             <button onclick="fazerLogout()">Sair</button>
         </nav>
         
-        <div id="painel-professor" style="display:none;">
-            <h3>Inserir Aula</h3>
-            <input type="text" id="post-tema" placeholder="Tema">
-            <input type="text" id="post-pergunta" placeholder="Pergunta">
-            <button onclick="publicarAula()">Publicar</button>
+        <div id="painel-professor" style="display:none;" class="card">
+            <h3>Gerenciar Aulas</h3>
+            <input type="text" id="novo-tema" placeholder="Título da Nova Lição">
+            <button onclick="adicionarLicao()">Adicionar Lição</button>
         </div>
         
         <div id="feed-licoes" class="conteudo"></div>
-        <div id="lista-oficial-membros" class="conteudo"></div>
+        <div id="lista-oficial-membros" class="conteudo" style="display:none;"></div>
     </div>
     <script src="script.js"></script>
 </body>
