@@ -1,10 +1,9 @@
 // ==========================================================================
-// PORTAL EBD LUZ ETERNA - CÓDIGO FINAL INTEGRADO
+// PORTAL EBD LUZ ETERNA - CÓDIGO FINAL (ERRO DE LOGIN CORRIGIDO)
 // ==========================================================================
 
 const FIREBASE_URL = "https://ebd-luz-eterna-default-rtdb.firebaseio.com/";
 
-// Lista Completa de Membros
 const MEMBROS_BASE = [
     { nome: "Luiz Kalizak", cargo: "Líder/Professor" },
     { nome: "Luiz Gustavo Machado Kalizak", cargo: "Líder/Professor" },
@@ -75,48 +74,52 @@ async function puxar(pasta) {
     } catch (e) { return null; }
 }
 
-// --- AUTENTICAÇÃO E LOGIN ---
+// --- AUTENTICAÇÃO COM CORREÇÃO DE GRAFIA ---
 function executarLogin() {
     const nomeInput = document.getElementById('login-nome').value.trim();
-    let membros = JSON.parse(localStorage.getItem('bd_membros') || "[]");
-    let usuario = membros.find(m => m.nome.toLowerCase() === nomeInput.toLowerCase());
     
-    if (!usuario) return alert("Nome não localizado na lista de classe.");
+    // Puxa do localStorage (já sincronizado na inicialização)
+    let membros = JSON.parse(localStorage.getItem('bd_membros') || "[]");
+    
+    // CORREÇÃO: Comparação insensível a maiúsculas/minúsculas e espaços
+    let usuario = membros.find(m => m.nome.trim().toLowerCase() === nomeInput.toLowerCase());
+    
+    if (!usuario) {
+        alert("Erro: O nome '" + nomeInput + "' não foi localizado na lista oficial. Verifique se escreveu o nome completo.");
+        return;
+    }
     
     localStorage.setItem('usuarioLogado', usuario.nome);
     localStorage.setItem('perfil', usuario.cargo === "Líder/Professor" ? 'professor' : 'aluno');
     window.location.reload();
 }
 
-// --- SINCRONIZAÇÃO E INTERFACE ---
+// --- SINCRONIZAÇÃO TOTAL ---
 async function iniciarSessao() {
-    // Garante que os membros estejam no Firebase
+    // Busca na nuvem e, se falhar ou estiver vazio, garante a MEMBROS_BASE
     let membrosNuvem = await puxar('membros');
-    if (!membrosNuvem) {
+    
+    if (!membrosNuvem || membrosNuvem.length === 0) {
         await salvar('membros', MEMBROS_BASE);
         localStorage.setItem('bd_membros', JSON.stringify(MEMBROS_BASE));
     } else {
         localStorage.setItem('bd_membros', JSON.stringify(membrosNuvem));
     }
     
-    // Mostra o dashboard
     document.getElementById('tela-auth').style.display = 'none';
     document.getElementById('tela-dashboard').style.display = 'block';
     
-    // Inicia a atualização automática
-    setInterval(renderizarTudo, 3000);
     renderizarTudo();
+    setInterval(renderizarTudo, 5000);
 }
 
 async function renderizarTudo() {
     const licoes = await puxar('licoes') || [];
-    const presencas = await puxar('presencas') || {};
     const container = document.getElementById('feed-licoes');
     if (!container) return;
 
-    // Renderiza o cronograma (usando a lógica que você já tinha)
     container.innerHTML = licoes.map(licao => `
-        <div class="card-aula" style="border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 8px;">
+        <div class="card-aula" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px;">
             <h3>${licao.tema}</h3>
             <p>Status: <strong>${licao.status}</strong></p>
             ${localStorage.getItem('perfil') === 'professor' ? 
@@ -130,6 +133,7 @@ async function confirmarPresenca(licaoId) {
     const usuario = localStorage.getItem('usuarioLogado');
     let presencas = await puxar('presencas') || {};
     if (!presencas[licaoId]) presencas[licaoId] = [];
+    
     if (!presencas[licaoId].includes(usuario)) {
         presencas[licaoId].push(usuario);
         await salvar('presencas', presencas);
@@ -146,5 +150,7 @@ async function alterarStatus(licaoId, novoStatus) {
 }
 
 window.onload = () => {
-    if (localStorage.getItem('usuarioLogado')) iniciarSessao();
+    if (localStorage.getItem('usuarioLogado')) {
+        iniciarSessao();
+    }
 };
