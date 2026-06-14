@@ -9,11 +9,28 @@
 <body>
     <header>
         <h1 class="logo">Luz Eterna</h1>
-    </header>
+        <div class="infinito">&infin;</div> </header>
 
     <section id="login-screen">
-        <input type="text" id="user-name" placeholder="Nome igual ao WhatsApp">
-        <button onclick="fazerLogin()">Entrar no Painel</button>
+        <div class="login-card">
+            <h3>Seja Bem-vindo</h3>
+            
+            <div id="login-form">
+                <input type="text" id="user-name" placeholder="Nome igual ao WhatsApp">
+                <button onclick="fazerLogin()">Fazer Login</button>
+                <p style="text-align:center; margin-top:15px; font-size:0.9rem;">
+                    Não tem conta? <a href="#" onclick="alternarForm('cadastro')" style="color:#FFD700;">Cadastrar-se</a>
+                </p>
+            </div>
+
+            <div id="cadastro-form" style="display:none;">
+                <input type="text" id="new-name" placeholder="Nome Completo">
+                <button onclick="solicitarCadastro()">Cadastrar</button>
+                <p style="text-align:center; margin-top:15px; font-size:0.9rem;">
+                    Já tem conta? <a href="#" onclick="alternarForm('login')" style="color:#FFD700;">Login</a>
+                </p>
+            </div>
+        </div>
     </section>
 
     <section id="dashboard" style="display:none;">
@@ -25,10 +42,10 @@
         </nav>
 
         <div id="aula" class="aba">
-            <h2 id="titulo-aula">Aguardando início...</h2>
+            <h2 id="titulo-aula">Aguardando aula...</h2>
             <div class="timer-area">
-                <p>Cronômetro</p>
-                <div id="timer">00:00</div>
+                <p>Status: <span id="status-aula">Fechada</span></p>
+                <div id="timer" style="font-size: 1.5rem; font-weight:bold;">00:00</div>
             </div>
             <button id="btn-presenca" onclick="registrarPresenca()">Confirmar Presença</button>
             <textarea id="resp-aluno" placeholder="Resposta final da aula..." disabled></textarea>
@@ -37,14 +54,22 @@
             <p id="status-texto">0/60 presentes</p>
         </div>
 
-        <div id="ebds" class="aba" style="display:none;"><h3>Lições do Trimestre</h3><div id="lista-licoes"></div></div>
-        <div id="diario" class="aba" style="display:none;"><h3>Diário de Classe</h3><ul id="lista-alunos"></ul></div>
+        <div id="ebds" class="aba" style="display:none;">
+            <h3>Lições do Trimestre</h3>
+            <div id="lista-licoes"></div>
+        </div>
+
+        <div id="diario" class="aba" style="display:none;">
+            <h3>Diário de Classe (Total: 60)</h3>
+            <ul id="lista-alunos"></ul>
+        </div>
+
         <div id="admin" class="aba" style="display:none;">
-            <h3>Publicação</h3>
-            <input id="in-titulo" placeholder="Título">
-            <textarea id="in-versiculos" placeholder="Versículos"></textarea>
-            <textarea id="in-pergunta" placeholder="Pergunta da aula"></textarea>
-            <button onclick="publicarAula()">Publicar Aula</button>
+            <h3>Painel de Publicação</h3>
+            <input id="in-titulo" placeholder="Título da Lição">
+            <textarea id="in-versiculos" placeholder="Versículos Bíblicos"></textarea>
+            <textarea id="in-pergunta" placeholder="Pergunta para resposta final"></textarea>
+            <button onclick="publicarAula()">Publicar / Abrir Aula</button>
         </div>
     </section>
     <script type="module" src="script.js"></script>
