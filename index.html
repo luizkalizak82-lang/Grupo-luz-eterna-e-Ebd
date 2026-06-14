@@ -3,147 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal EBD - Jovens Luz Eterna</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+    <title>Portal EBD Jovens 2026</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <header>
-        <div class="header-container">
-            <nav id="nav-principal" style="display: none;">
-                <div class="nav-links">
-                    <a onclick="navegarPara('tela-dashboard')">Início</a>
-                    <a onclick="navegarPara('tela-licoes')">Cronograma EBD</a>
-                    <a onclick="navegarPara('tela-membros')">Diário de Classe</a>
+    <!-- TELA DE AUTENTICAÇÃO (LOGIN) -->
+    <div id="tela-auth" class="tela ativa">
+        <div class="auth-container">
+            <h2>Portal EBD Jovens</h2>
+            <p style="text-align: center; color: #b3c5ef; font-size: 0.9rem; margin-bottom: 1.5rem;">Classe de Jovens - Ano Letivo 2026</p>
+            
+            <div id="auth-login-view">
+                <div class="input-group">
+                    <label for="login-nome">Digite seu nome completo:</label>
+                    <input type="text" id="login-nome" placeholder="Ex: Nadia Pezzini ou Michael">
                 </div>
-                <div class="user-status-bar">
-                    Olá, <span id="nome-usuario-logado">Usuário</span> 
-                    <span id="badge-perfil" class="badge-role"></span>
-                    <button class="btn-logout" onclick="fazerLogout()">Sair</button>
-                </div>
-            </nav>
+                <div id="login-alert" class="alert"></div>
+                <button class="btn-principal" onclick="executarLogin()">Entrar no Portal</button>
+                <p class="auth-toggle">É um aluno novo? <a href="#" onclick="alternarAbasAuth(true)">Cadastre-se aqui</a></p>
+            </div>
 
-            <div class="logo-area-central">
-                <h1>Luz Eterna</h1>
-                <p>Portal da Escola Bíblica Dominical</p>
+            <div id="auth-cadastro-view" style="display: none;">
+                <div class="input-group">
+                    <label for="cadastro-nome">Nome Completo do Aluno:</label>
+                    <input type="text" id="cadastro-nome" placeholder="Digite seu nome completo para registro">
+                </div>
+                <div id="cadastro-alert" class="alert"></div>
+                <button class="btn-principal" style="background-color: var(--dourado); color: var(--azul-escuro);" onclick="executarCadastro()">Finalizar Cadastro</button>
+                <p class="auth-toggle">Já tem cadastro? <a href="#" onclick="alternarAbasAuth(false)">Voltar para o Login</a></p>
             </div>
         </div>
-    </header>
+    </div>
 
+    <!-- MENU DE NAVEGAÇÃO PRINCIPAL (Fica oculto até logar) -->
+    <nav id="nav-principal" style="display: none;">
+        <button onclick="navegarPara('tela-dashboard')">📅 Cronograma</button>
+        <button onclick="navegarPara('tela-exercicios')">📝 Exercícios</button>
+        <button onclick="navegarPara('tela-diario')">👥 Diário de Classe</button>
+        <button class="btn-logout" onclick="fazerLogout()">Sair</button>
+    </nav>
+
+    <!-- CONTEÚDO PRINCIPAL DO SISTEMA -->
     <main>
-        <section id="tela-auth" class="tela ativa">
-            <div class="auth-container card">
-                <div id="auth-login-view">
-                    <h2>Entrar no Portal</h2>
-                    <p class="subtitle">Digite seu nome completo para acessar as aulas</p>
-                    <div id="login-alert" class="alert alert-error" style="display: none;"></div>
-                    <div class="form-group">
-                        <label for="login-nome">Seu Nome Completo</label>
-                        <input type="text" id="login-nome" placeholder="Ex: Luiz Kalizak">
-                    </div>
-                    <button class="btn-principal" onclick="executarLogin()">Entrar na Classe</button>
-                    <div class="auth-toggle">
-                        Ainda não está na lista? <span onclick="alternarAbasAuth(true)">Cadastre-se aqui</span>
-                    </div>
-                </div>
-
-                <div id="auth-cadastro-view" style="display: none;">
-                    <h2>Criar Cadastro</h2>
-                    <p class="subtitle">Registre seu nome oficial no grupo Luz Eterna</p>
-                    <div id="cadastro-alert" class="alert alert-error" style="display: none;"></div>
-                    <div class="form-group">
-                        <label for="cadastro-nome">Nome Completo</label>
-                        <input type="text" id="cadastro-nome" placeholder="Ex: Gabriel Silva Santos">
-                    </div>
-                    <button class="btn-principal" onclick="executarCadastro()">Confirmar Registro</button>
-                    <div class="auth-toggle">
-                        Já possui cadastro? <span onclick="alternarAbasAuth(false)">Fazer login</span>
-                    </div>
+        <!-- TELA: CRONOGRAMA / FEED DE LIÇÕES -->
+        <div id="tela-dashboard" class="tela">
+            <div class="header-usuario">
+                <div>
+                    <h1>Olá, <span id="nome-usuario-logado">-</span>!</h1>
+                    <span id="badge-perfil" class="badge-role">Aluno</span>
                 </div>
             </div>
-        </section>
 
-        <section id="tela-dashboard" class="tela">
-            <div class="card">
-                <h2>📍 Central do Aluno - Luz Eterna</h2>
-                <p>Seja bem-vindo! A chamada eletrônica, exercícios e a barra de frequência oficial estão concentrados no menu superior <strong style="color:var(--dourado); text-decoration:underline; cursor:pointer;" onclick="navegarPara('tela-licoes')">"Cronograma EBD"</strong>.</p>
-                <p style="margin-top:10px;">Para acompanhar quem já está inscrito na nossa classe hoje, visite a aba <strong style="color:var(--dourado); text-decoration:underline; cursor:pointer;" onclick="navegarPara('tela-membros')">"Diário de Classe"</strong>.</p>
+            <!-- MÓDULO DE MÉTRICAS (FREQUÊNCIA DA CLASSE) -->
+            <div class="card-metricas">
+                <h3>📊 Frequência da Classe Hoje</h3>
+                <div class="barra-progresso-container">
+                    <div id="barra-progresso-frequencia" class="barra-progresso"></div>
+                </div>
+                <p style="font-size: 0.85rem; margin-top: 5px; color: #b3c5ef;">
+                    <span id="txt-presentes-hoje">0</span> de <span id="txt-meta-alunos">50</span> alunos presentes hoje (<span id="txt-porcentagem-hoje">0%</span>)
+                </p>
             </div>
-        </section>
 
-        <section id="tela-licoes" class="tela">
-            <div class="card card-admin-action" id="painel-cadastro-licao" style="display: none;">
-                <h2>📝 Gerenciamento de Aulas: Inserir Conteúdo Dominical</h2>
-                <p style="color: var(--dourado-claro); font-size: 0.9rem; margin-bottom: 1.2rem;">Use esta área para publicar o tema da aula, perguntas reflexivas e as anotações do diário de classe.</p>
-                
-                <div class="form-group">
-                    <label for="post-tema">📖 Escolha o Tema ou Assunto</label>
-                    <input type="text" id="post-tema" placeholder="Ex: Lição 4 - Eude e Sangar: Deus usa os improváveis">
+            <!-- PAINEL EXCLUSIVO DOS PROFESSORES (Criar Lições) -->
+            <div id="painel-cadastro-licao" class="card" style="display: none; border: 1px solid var(--dourado);">
+                <h3 style="color: var(--dourado); margin-bottom: 10px;">🛠️ Painel de Controle: Postar Nova Aula/Tema</h3>
+                <div class="input-group">
+                    <label>Tema ou Título da Lição:</label>
+                    <input type="text" id="post-tema" placeholder="Ex: Lição 14: Vivendo em Santidade">
                 </div>
-                
-                <div class="form-group">
-                    <label for="post-pergunta">✍️ Exercício / Pergunta da Aula</label>
-                    <input type="text" id="post-pergunta" placeholder="O que os alunos devem responder após a ministração?">
+                <div class="input-group">
+                    <label>Pergunta ou Exercício de Fixação para os Alunos:</label>
+                    <input type="text" id="post-pergunta" placeholder="Ex: O que significa santidade no seu dia a dia?">
                 </div>
-
-                <div class="form-group">
-                    <label for="post-observacao">📋 Anotações e Observações Gerais da Aula</label>
-                    <input type="text" id="post-observacao" placeholder="Fatos relevantes, necessidades de oração detectadas, etc.">
+                <div class="input-group">
+                    <label>Observações / Avisos Gerais (Opcional):</label>
+                    <textarea id="post-observacao" rows="2" placeholder="Ex: Trazer a revista física no próximo domingo."></textarea>
                 </div>
-                
-                <div class="form-group">
-                    <label for="post-status">⚡ Estado Inicial do Conteúdo</label>
-                    <select id="post-status" class="select-custom">
-                        <option value="agendada">📅 Agendada (Apenas visualização do tema pelos alunos)</option>
-                        <option value="aberta">🔓 Aberta para Hoje (Libera chamada eletrônica e exercício)</option>
+                <div class="input-group">
+                    <label>Status Inicial da Aula:</label>
+                    <select id="post-status">
+                        <option value="agendada">📅 Agendada (Bloqueada para o futuro)</option>
+                        <option value="aberta" selected>🔓 Aberta (Disponível para chamada e respostas)</option>
                     </select>
                 </div>
-                <button class="btn-principal" onclick="publicarNovaLicao()">🚀 Publicar Aula na Plataforma</button>
+                <button class="btn-principal" style="background-color: var(--dourado); color: var(--azul-escuro);" onclick="publicarNovaLicao()">Publicar Tema no Cronograma</button>
             </div>
 
-            <div class="card metricas-container-box">
-                <h2>📊 Frequência Geral de Alunos (Classe Juvenil)</h2>
-                <div class="metricas-flex-grid">
-                    <div class="metrica-item">
-                        <span class="metrica-num" id="txt-meta-alunos">50</span>
-                        <span class="metrica-lbl">Alunos na Meta</span>
-                    </div>
-                    <div class="metrica-item">
-                        <span class="metrica-num" id="txt-presentes-hoje">0</span>
-                        <span class="metrica-lbl">Presentes Hoje</span>
-                    </div>
-                    <div class="metrica-item">
-                        <span class="metrica-num" id="txt-porcentagem-hoje">0%</span>
-                        <span class="metrica-lbl">Aproveitamento</span>
-                    </div>
-                </div>
-                <div class="metric-container">
-                    <div class="metric-bar" id="barra-progresso-frequencia"></div>
-                </div>
-            </div>
+            <h2>📅 Cronograma de Lições da EBD</h2>
+            <div id="feed-licoes"></div>
+        </div>
 
-            <div class="card">
-                <h2>📅 Cronograma Oficial e Registro de Matérias</h2>
-                <p style="color: var(--dourado-claro); margin-bottom: 1.5rem; font-size: 0.9rem;">As lições programadas aparecem listadas abaixo. A chamada fica restrita às aulas marcadas como "Aberta para Hoje".</p>
-                <div id="feed-licoes"></div>
-            </div>
-        </section>
+        <!-- TELA: EXERCÍCIOS DE FIXAÇÃO -->
+        <div id="tela-exercicios" class="tela">
+            <h2>📝 Exercícios de Fixação</h2>
+            <p style="color: #b3c5ef; margin-bottom: 1rem;">Responda às atividades das lições para pontuar e fixar o aprendizado:</p>
+            <div id="feed-exercicios"></div>
+        </div>
 
-        <section id="tela-membros" class="tela">
-            <div class="card">
-                <h2>👥 Diário de Classe: Lista Oficial de Membros</h2>
-                <p style="font-size:0.9rem; color:var(--dourado-claro); margin-bottom:15px;">Abaixo estão listados todos os líderes, professores e alunos registrados na plataforma até o momento:</p>
-                <div class="membros-list" id="lista-oficial-membros"></div>
+        <!-- TELA: DIÁRIO DE CLASSE (LISTA OFICIAL) -->
+        <div id="tela-diario" class="tela">
+            <h2>👥 Lista Oficial de Membros</h2>
+            <p style="color: #b3c5ef; margin-bottom: 1rem;">Membros ativos pré-cadastrados na Classe de Jovens:</p>
+            <div class="card" style="padding: 10px 15px;">
+                <div id="lista-oficial-membros"></div>
             </div>
-        </section>
+        </div>
     </main>
-
-    <footer>
-        <p>&copy; 2026 Grupo de Jovens Luz Eterna - Escola Bíblica Dominical</p>
-    </footer>
 
     <script src="script.js"></script>
 </body>
