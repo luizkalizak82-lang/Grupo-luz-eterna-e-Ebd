@@ -1,5 +1,5 @@
 // ==========================================================================
-// PORTAL EBD LUZ ETERNA - CÓDIGO FINAL (ERRO DE LOGIN CORRIGIDO)
+// PORTAL EBD LUZ ETERNA - CÓDIGO COMPLETO E CORRIGIDO
 // ==========================================================================
 
 const FIREBASE_URL = "https://ebd-luz-eterna-default-rtdb.firebaseio.com/";
@@ -56,7 +56,7 @@ const MEMBROS_BASE = [
     { nome: "Vanessa", cargo: "Aluno" }
 ];
 
-// --- FUNÇÕES DE NUVEM ---
+// --- FUNÇÕES DE COMUNICAÇÃO COM O FIREBASE ---
 async function salvar(pasta, dados) {
     try {
         await fetch(`${FIREBASE_URL}${pasta}.json`, {
@@ -64,7 +64,7 @@ async function salvar(pasta, dados) {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(dados)
         });
-    } catch (e) { console.error("Erro na Nuvem:", e); }
+    } catch (e) { console.error("Erro ao salvar:", e); }
 }
 
 async function puxar(pasta) {
@@ -74,18 +74,19 @@ async function puxar(pasta) {
     } catch (e) { return null; }
 }
 
-// --- AUTENTICAÇÃO COM CORREÇÃO DE GRAFIA ---
+// --- FUNÇÃO DE LOGIN CORRIGIDA ---
 function executarLogin() {
     const nomeInput = document.getElementById('login-nome').value.trim();
     
-    // Puxa do localStorage (já sincronizado na inicialização)
+    // Tenta pegar a lista sincronizada ou usa a base fixa
     let membros = JSON.parse(localStorage.getItem('bd_membros') || "[]");
-    
-    // CORREÇÃO: Comparação insensível a maiúsculas/minúsculas e espaços
+    if (membros.length === 0) membros = MEMBROS_BASE;
+
+    // Compara ignorando maiúsculas/minúsculas e espaços
     let usuario = membros.find(m => m.nome.trim().toLowerCase() === nomeInput.toLowerCase());
     
     if (!usuario) {
-        alert("Erro: O nome '" + nomeInput + "' não foi localizado na lista oficial. Verifique se escreveu o nome completo.");
+        alert("Erro: O nome '" + nomeInput + "' não foi localizado. Verifique se digitou corretamente.");
         return;
     }
     
@@ -94,23 +95,18 @@ function executarLogin() {
     window.location.reload();
 }
 
-// --- SINCRONIZAÇÃO TOTAL ---
+// --- SINCRONIZAÇÃO E RENDERIZAÇÃO ---
 async function iniciarSessao() {
-    // Busca na nuvem e, se falhar ou estiver vazio, garante a MEMBROS_BASE
+    // Busca dados da nuvem
     let membrosNuvem = await puxar('membros');
-    
-    if (!membrosNuvem || membrosNuvem.length === 0) {
-        await salvar('membros', MEMBROS_BASE);
-        localStorage.setItem('bd_membros', JSON.stringify(MEMBROS_BASE));
-    } else {
-        localStorage.setItem('bd_membros', JSON.stringify(membrosNuvem));
-    }
+    if (membrosNuvem) localStorage.setItem('bd_membros', JSON.stringify(membrosNuvem));
+    else await salvar('membros', MEMBROS_BASE);
     
     document.getElementById('tela-auth').style.display = 'none';
     document.getElementById('tela-dashboard').style.display = 'block';
     
     renderizarTudo();
-    setInterval(renderizarTudo, 5000);
+    setInterval(renderizarTudo, 5000); // Atualiza o feed automaticamente
 }
 
 async function renderizarTudo() {
@@ -137,20 +133,18 @@ async function confirmarPresenca(licaoId) {
     if (!presencas[licaoId].includes(usuario)) {
         presencas[licaoId].push(usuario);
         await salvar('presencas', presencas);
-        alert("Presença confirmada!");
+        alert("Presença confirmada com sucesso!");
         renderizarTudo();
     }
 }
 
 async function alterarStatus(licaoId, novoStatus) {
     let licoes = await puxar('licoes') || [];
-    licoes = licoes.map(l => l.id === licaoId ? {...l, status: novoStatus} : l);
+    licoes = licoes.map(l => l.id == licaoId ? {...l, status: novoStatus} : l);
     await salvar('licoes', licoes);
     renderizarTudo();
 }
 
 window.onload = () => {
-    if (localStorage.getItem('usuarioLogado')) {
-        iniciarSessao();
-    }
+    if (localStorage.getItem('usuarioLogado')) iniciarSessao();
 };
