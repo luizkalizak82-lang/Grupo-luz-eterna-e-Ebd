@@ -1,78 +1,8 @@
-:root {
-    --azul-escuro-nav: #0a1424;
-    --azul-card-bg: #0f2142;
-    --dourado-tema: #d2b24c;
-    --fundo-gradiente-fim: #e8ecf4;
-    --branco-puro: #ffffff;
-    --texto-escuro: #212529;
-    --texto-claro-sub: #a5b4fc;
-    --cor-sucesso: #198754;
-    --cor-erro: #dc3545;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
-
-body {
-    background: linear-gradient(180deg, #ffffff 0%, var(--fundo-gradiente-fim) 100%);
-    min-height: 100vh;
-    color: var(--texto-escuro);
-    padding-bottom: 60px;
-}
-
-/* Navegação */
-.top-nav-bar { background-color: var(--azul-escuro-nav); padding: 12px 10px; text-align: center; }
-nav { display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; }
-nav button { background: none; border: none; color: var(--branco-puro); font-size: 0.95rem; font-weight: 500; cursor: pointer; padding: 4px 8px; }
-nav button:hover { color: var(--dourado-tema); }
-
-/* Telas e Cards */
-.tela { display: none; max-width: 520px; margin: 0 auto; padding: 0 15px; }
-.tela.ativa { display: block; }
-
-.auth-card, .card {
-    background: var(--branco-puro);
-    border-radius: 12px;
-    padding: 30px 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    text-align: center;
-    margin-top: 20px;
-    border-top: 4px solid var(--azul-card-bg);
-}
-
-.content-card {
-    background-color: var(--azul-card-bg);
-    color: var(--branco-puro);
-    padding: 22px 18px;
-    border-radius: 14px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.12);
-    margin-bottom: 20px;
-}
-
-.card-title { color: var(--dourado-tema); font-size: 1.15rem; margin-bottom: 4px; }
-.card-subtitle { font-size: 0.82rem; color: var(--texto-claro-sub); margin-bottom: 18px; }
-
-/* Formulários e Ações */
-.form-group, .input-group { margin-bottom: 14px; text-align: left; }
-.form-group input, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ced4da; margin-bottom: 10px; }
-
-.btn-primary, button { width: 100%; background-color: var(--azul-escuro-nav); color: var(--branco-puro); padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
-.btn-secundario { background-color: #ccc; color: var(--texto-escuro); }
-
-/* Gestão de Aulas e Membros */
-.inner-item-box { background: var(--branco-puro); border: 1px solid #e2e8f0; padding: 15px; border-radius: 10px; margin-bottom: 12px; }
-.membro-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.1); }
-
-/* Novos Controles */
-.control-select { padding: 8px; border-radius: 4px; border: 1px solid #ccc; width: auto !important; margin-right: 5px; }
-.btn-delete-full { background-color: var(--cor-erro); color: white; padding: 8px 12px; border-radius: 4px; border: none; cursor: pointer; font-size: 0.8rem; }
-
-.badge-role { font-size: 0.75rem; font-weight: bold; padding: 3px 10px; border-radius: 12px; }
-.role-professor { background-color: var(--dourado-tema); color: var(--azul-escuro-nav); }
-.role-aluno { background-color: #e2e8f0; color: var(--texto-escuro); }
-
-.conteudo { display: none; }
+body { background-color: #001f3f; color: white; font-family: 'Georgia', serif; text-align: center; }
+header { padding: 20px; border-bottom: 2px solid #FFD700; }
+h1, h2 { color: #FFD700; font-style: italic; }
+.aba { padding: 20px; }
+nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+button { background: #FFD700; color: #001f3f; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; }
+.barra-externa { width: 80%; margin: 20px auto; height: 25px; background: white; border-radius: 15px; overflow: hidden; }
+#barra-progresso { height: 100%; width: 0%; background: #FFD700; transition: 0.5s; }
