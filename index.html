@@ -12,32 +12,20 @@
         <div class="infinito">&infin;</div>
     </header>
 
-    <section id="login-area">
-        <div class="card">
-            <input type="text" id="user-name" placeholder="Nome igual ao WhatsApp">
-            <button class="gold" onclick="entrar()">Entrar / Cadastrar</button>
-        </div>
+    <section id="login-area" class="card">
+        <input type="text" id="user-name" placeholder="Nome igual ao WhatsApp">
+        <button class="gold" onclick="entrar()">Entrar no Portal</button>
     </section>
 
     <section id="dashboard" style="display:none;">
-        <nav>
-            <button onclick="location.reload()">Home</button>
+        <nav id="menu-principal">
             <button onclick="abrir('aula')">Aula Hoje</button>
             <button onclick="abrir('ebds')">Lições EBD</button>
             <button onclick="abrir('diario')">Diário</button>
+            <button id="btn-admin" class="gold prof-only" style="display:none;" onclick="abrir('admin')">Painel Professor</button>
         </nav>
-
         <div id="conteudo-principal"></div>
-        
-        <div id="admin-panel" class="card admin-only" style="display:none;">
-            <h3>Painel do Líder</h3>
-            <input type="text" id="in-titulo" placeholder="Título">
-            <textarea id="in-texto" placeholder="Textos Bíblicos"></textarea>
-            <textarea id="in-pergunta" placeholder="Pergunta da aula"></textarea>
-            <button class="gold" onclick="publicarAula()">Publicar Aula</button>
-        </div>
     </section>
-
     <script type="module" src="script.js"></script>
 </body>
 </html>
