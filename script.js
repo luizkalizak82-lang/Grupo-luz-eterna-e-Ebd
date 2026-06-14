@@ -1,5 +1,5 @@
 // ==========================================================================
-// PORTAL EBD - SISTEMA LUZ ETERNA 2026 (PERSISTÊNCIA TOTAL E GERENCIAMENTO ADM)
+// PORTAL EBD - SISTEMA LUZ ETERNA 2026 (SINCRONIZAÇÃO DE PRESENÇA E MÉTRICAS)
 // ==========================================================================
 
 const MEMBROS_PRE_CADASTRADOS = [
@@ -71,7 +71,7 @@ function gerarListaDomingosCPAD() {
         "Lição 10: Sansão: entre vitórias e derrotas",
         "Lição 11: Crise espiritual e falsa religiosidade",
         "Lição 12: Tempos de decadência moral e maldade",
-        "Lição 13: Esperança em meio ao caos: aguardando a vinda do rei"
+        "Lição 13: Esperança in meio ao caos: aguardando a vinda do rei"
     ];
 
     for (let i = 0; i < 13; i++) {
@@ -93,6 +93,7 @@ function gerarListaDomingosCPAD() {
     return domingos;
 }
 
+// Inicializadores das tabelas de dados local
 if (!localStorage.getItem('bd_membros')) {
     localStorage.setItem('bd_membros', JSON.stringify(MEMBROS_PRE_CADASTRADOS));
 }
@@ -116,9 +117,6 @@ function normalizarTextoParaBusca(txt) {
     return txt.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
-// ==========================================================================
-// FUNÇÃO DE LOGIN CORRIGIDA (CORREÇÃO DO NOME DA FUNÇÃO)
-// ==========================================================================
 function executarLogin() {
     const nomeInput = document.getElementById('login-nome').value.trim();
     if (!nomeInput) return mostrarAlerta('login-alert', 'Informe o seu nome.');
@@ -170,6 +168,11 @@ function iniciarSessao() {
     document.getElementById('painel-criar-exercicio-extra').style.display = perfil === 'professor' ? 'block' : 'none';
 
     sincronizarTelasEReatividade();
+
+    // Cronômetro de Varredura Imediata (Varre e atualiza a tela a cada 2 segundos)
+    setInterval(() => {
+        sincronizarTelasEReatividade();
+    }, 2000);
 }
 
 function sincronizarTelasEReatividade() {
@@ -179,12 +182,18 @@ function sincronizarTelasEReatividade() {
     listarMembrosNaTela();
 }
 
+// ==========================================================================
+// CÁLCULO E EXIBIÇÃO DO CONTADOR E DA BARRA DE PORCENTAGEM
+// ==========================================================================
 function atualizarMétricasFrequência() {
     const licoes = JSON.parse(localStorage.getItem('bd_licoes')) || [];
     const dPresenças = JSON.parse(localStorage.getItem('bd_presenças_v2')) || {};
     const membros = JSON.parse(localStorage.getItem('bd_membros')) || [];
     
+    // Filtra apenas os alunos cadastrados para compor a meta real
     const totalAlunosInscritos = membros.filter(m => m.cargo === 'Aluno').length || 1;
+    
+    // Busca qual é a lição que está com o status "aberta" no momento
     const licaoAtiva = licoes.find(l => l.status === 'aberta') || licoes[0];
     
     let totalPresentes = 0;
@@ -192,17 +201,15 @@ function atualizarMétricasFrequência() {
         totalPresentes = dPresenças[String(licaoAtiva.id)].length;
     }
 
+    // Calcula a porcentagem com base nos presentes reais sobre a meta de alunos
     let pct = ((totalPresentes / totalAlunosInscritos) * 100).toFixed(0);
     if (parseInt(pct) > 100) pct = '100';
 
-    document.getElementById('txt-total-meta').innerText = totalAlunosInscritos;
-    document.getElementById('txt-presentes-hoje').innerText = totalPresentes;
-    document.getElementById('txt-porcentagem-hoje').innerText = `${pct}%`;
-    document.getElementById('barra-progresso-frequencia').style.width = `${pct}%`;
-}
-
-function publishingNovaLicao() { // Mantida a compatibilidade interna se necessário
-    publicarNovaLicao();
+    // Injeta os valores vivos direto nas tags do seu HTML
+    if(document.getElementById('txt-total-meta')) document.getElementById('txt-total-meta').innerText = totalAlunosInscritos;
+    if(document.getElementById('txt-presentes-hoje')) document.getElementById('txt-presentes-hoje').innerText = totalPresentes;
+    if(document.getElementById('txt-porcentagem-hoje')) document.getElementById('txt-porcentagem-hoje').innerText = `${pct}%`;
+    if(document.getElementById('barra-progresso-frequencia')) document.getElementById('barra-progresso-frequencia').style.width = `${pct}%`;
 }
 
 function publicarNovaLicao() {
@@ -234,12 +241,12 @@ function publicarNovaLicao() {
     document.getElementById('post-pergunta').value = '';
     document.getElementById('post-observacao').value = '';
 
-    alert(`Aula "${tema}" publicada com sucesso e salva definitivamente!`);
     sincronizarTelasEReatividade();
+    alert(`Aula "${tema}" publicada com sucesso!`);
 }
 
 function deletarLicaoRemoto(licaoId) {
-    if (!confirm("Tem certeza absoluta de que deseja excluir permanentemente esta aula do sistema?")) return;
+    if (!confirm("Tem certeza que deseja excluir permanentemente esta aula?")) return;
 
     let licoes = JSON.parse(localStorage.getItem('bd_licoes')) || [];
     licoes = licoes.filter(l => String(l.id) !== String(licaoId));
@@ -251,14 +258,15 @@ function deletarLicaoRemoto(licaoId) {
         localStorage.setItem('bd_presenças_v2', JSON.stringify(dPresenças));
     }
 
-    alert("Aula excluída com sucesso!");
     sincronizarTelasEReatividade();
 }
 
 function mudarStatusLicaoRemoto(licaoId, novoStatus) {
     let licoes = JSON.parse(localStorage.getItem('bd_licoes')) || [];
     licoes = licoes.map(l => {
-        if (String(l.id) === String(licaoId)) l.status = novoStatus;
+        if (String(l.id) === String(licaoId)) {
+            l.status = novoStatus;
+        }
         return l;
     });
     localStorage.setItem('bd_licoes', JSON.stringify(licoes));
@@ -279,7 +287,7 @@ function atualizarFeedLicoes() {
         return;
     }
 
-    feed.innerHTML = '';
+    let htmlConteudo = '';
 
     const licoesOrdenadas = [...licoes].sort((a, b) => {
         if (a.status === 'aberta' && b.status !== 'aberta') return -1;
@@ -305,7 +313,7 @@ function atualizarFeedLicoes() {
                     <button class="btn-adm btn-adm-open" onclick="mudarStatusLicaoRemoto('${licao.id}', 'aberta')">Abrir</button>
                     <button class="btn-adm btn-adm-schedule" onclick="mudarStatusLicaoRemoto('${licao.id}', 'agendada')">Agendar</button>
                     <button class="btn-adm btn-adm-close" onclick="mudarStatusLicaoRemoto('${licao.id}', 'concluida')">Fechar</button>
-                    <button class="btn-adm btn-adm-delete" onclick="deletarLicaoRemoto('${licao.id}')">❌ Excluir Aula</button>
+                    <button class="btn-adm btn-adm-delete" onclick="deletarLicaoRemoto('${licao.id}')">❌ Deletar</button>
                 </div>`;
         }
 
@@ -313,8 +321,8 @@ function atualizarFeedLicoes() {
         if (licao.status === 'aberta') {
             areaAcaoChamada = `
                 <div class="box-action-area">
-                    <button class="btn-action-trigger" ${usuarioJaConfirmou ? 'style="background:#6c757d;"' : ''} onclick="assinarChamadaEletronica('${licao.id}')">
-                        ${usuarioJaConfirmou ? '✅ SUA PRESENÇA FOI CONFIRMADA' : '🙋‍♂️ CLIQUE AQUI PARA CONFIRMAR PRESENÇA'}
+                    <button class="btn-action-trigger" ${usuarioJaConfirmou ? 'style="background:#6c757d; cursor:not-allowed;" disabled' : ''} onclick="assinarChamadaEletronica('${licao.id}')">
+                        ${usuarioJaConfirmou ? '✅ PRESENÇA CONFIRMADA COM SUCESSO' : '🙋‍♂️ CLIQUE AQUI PARA CONFIRMAR PRESENÇA'}
                     </button>
                     <div style="margin-top:10px; font-size:0.82rem; color:#212529;">
                         <strong>Alunos confirmados nesta aula:</strong> 
@@ -330,7 +338,7 @@ function atualizarFeedLicoes() {
                 </div>`;
         }
 
-        feed.innerHTML += `
+        htmlConteudo += `
             <div class="inner-item-box ${cardExtraClass}">
                 <span class="status-indicator ${badgeStyle}">${labelStatus}</span>
                 <h4 style="color:var(--azul-card-bg); margin-bottom: 4px; font-size:1.05rem;">${licao.tema}</h4>
@@ -339,8 +347,13 @@ function atualizarFeedLicoes() {
                 ${painelControleAdm}
             </div>`;
     });
+
+    feed.innerHTML = htmlConteudo;
 }
 
+// ==========================================================================
+// CONFIRMAÇÃO DE PRESENÇA (FAZ O CONTADOR E A BARRA SUBIREM DE IMEDIATO)
+// ==========================================================================
 function assinarChamadaEletronica(licaoId) {
     const nome = localStorage.getItem('usuarioLogado');
     let dPresenças = JSON.parse(localStorage.getItem('bd_presenças_v2')) || {};
@@ -350,17 +363,17 @@ function assinarChamadaEletronica(licaoId) {
     if (!dPresenças[String(licaoId)].includes(nome)) {
         dPresenças[String(licaoId)].push(nome);
         localStorage.setItem('bd_presenças_v2', JSON.stringify(dPresenças));
+        
+        // Dispara o recálculo imediato dos contadores e da barra antes de re-renderizar a tela
         sincronizarTelasEReatividade();
-    } else {
-        alert('Sua presença já está registrada nesta lição.');
     }
 }
 
 function publicarExercicioAvulso() {
     const titulo = document.getElementById('ex-extra-titulo').value.trim();
-    const pregunta = document.getElementById('ex-extra-pergunta').value.trim();
+    const pergunta = document.getElementById('ex-extra-pergunta').value.trim();
 
-    if (!titulo || !pregunta) {
+    if (!titulo || !pergunta) {
         alert('Por favor, preencha o título e o enunciado.');
         return;
     }
@@ -369,7 +382,7 @@ function publicarExercicioAvulso() {
     const novoExAvulso = {
         id: String(Date.now()),
         tema: `Atividade: ${titulo}`,
-        pergunta: pregunta,
+        pergunta: pergunta,
         observacao: "Exercício avulso criado pelos líderes.",
         isAvulso: true,
         status: "aberta"
@@ -381,8 +394,8 @@ function publicarExercicioAvulso() {
     document.getElementById('ex-extra-titulo').value = '';
     document.getElementById('ex-extra-pergunta').value = '';
 
-    alert('Exercício postado com sucesso!');
     sincronizarTelasEReatividade();
+    alert('Exercício postado com sucesso!');
 }
 
 function atualizarAbaExercicios() {
@@ -400,7 +413,7 @@ function atualizarAbaExercicios() {
         return;
     }
 
-    container.innerHTML = '';
+    let htmlConteudo = '';
 
     liberados.forEach(licao => {
         const jaRespondeu = respostas.some(r => String(r.licaoId) === String(licao.id) && r.aluno === nomeUser);
@@ -425,7 +438,7 @@ function atualizarAbaExercicios() {
                 </div>`;
         }
 
-        container.innerHTML += `
+        htmlConteudo += `
             <div class="inner-item-box" style="border-left: 4px solid var(--dourado-tema);">
                 <h4 style="color:var(--azul-card-bg); font-size:0.95rem;">📋 ${licao.tema.includes(' - ') ? licao.tema.split(' - ')[1] : licao.tema}</h4>
                 <p style="font-size:0.88rem; margin-top:5px; background:#f8fafc; padding:8px; border-radius:4px; border:1px solid #edf2f7;"><strong>Pergunta:</strong> ${licao.pergunta}</p>
@@ -433,6 +446,8 @@ function atualizarAbaExercicios() {
                 ${feedRespostasGerais}
             </div>`;
     });
+
+    container.innerHTML = htmlConteudo;
 }
 
 function enviarExercicio(licaoId) {
@@ -444,8 +459,9 @@ function enviarExercicio(licaoId) {
 
     respostas.push({ licaoId: String(licaoId), aluno: nomeUser, texto: input.value.trim() });
     localStorage.setItem('bd_respostas', JSON.stringify(respostas));
-    alert('Resposta salva com sucesso!');
+    
     sincronizarTelasEReatividade();
+    alert('Resposta salva com sucesso!');
 }
 
 function listarMembrosNaTela() {
@@ -453,7 +469,9 @@ function listarMembrosNaTela() {
     if (!container) return;
 
     const membros = JSON.parse(localStorage.getItem('bd_membros')) || [];
-    document.getElementById('txt-total-membros-diario').innerText = membros.length;
+    if(document.getElementById('txt-total-membros-diario')) {
+        document.getElementById('txt-total-membros-diario').innerText = membros.length;
+    }
 
     const lideres = membros.filter(m => m.cargo === 'Líder/Professor');
     const alunos = membros.filter(m => m.cargo === 'Aluno');
