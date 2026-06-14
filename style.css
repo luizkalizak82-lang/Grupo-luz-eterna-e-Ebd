@@ -329,6 +329,7 @@ nav .btn-logout {
 .btn-adm-open { background-color: var(--cor-sucesso); }
 .btn-adm-schedule { background-color: #ff9f43; }
 .btn-adm-close { background-color: var(--cor-erro); }
+.btn-adm-delete { background-color: var(--cor-erro); margin-left: auto; }
 
 .badge-role {
     font-size: 0.75rem;
@@ -338,6 +339,25 @@ nav .btn-logout {
 }
 .role-professor { background-color: var(--dourado-tema); color: var(--azul-escuro-nav); }
 .role-aluno { background-color: #e2e8f0; color: var(--texto-escuro); }
+
+.total-membros-badge {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--dourado-tema);
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 15px;
+    color: #ffffff;
+}
+
+.diario-secao-titulo {
+    font-size: 1rem;
+    color: var(--dourado-tema);
+    margin: 15px 0 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    padding-bottom: 4px;
+}
 
 .membro-row {
     display: flex;
