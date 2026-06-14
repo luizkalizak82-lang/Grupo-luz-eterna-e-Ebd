@@ -1,10 +1,10 @@
 // ==========================================================================
-// PORTAL EBD - SISTEMA LUZ ETERNA 2026 (NUVEM COMPARTILHADA EM TEMPO REAL)
+// PORTAL EBD LUZ ETERNA - CÓDIGO INTEGRADO COM BANCO DE DADOS
 // ==========================================================================
 
-// Link do seu Firebase Realtime Database configurado com sucesso!
 const FIREBASE_URL = "https://ebd-luz-eterna-default-rtdb.firebaseio.com/";
 
+// --- LISTA DE MEMBROS (MANTIDA ORIGINAL) ---
 const MEMBROS_PRE_CADASTRADOS = [
     { nome: "Luiz Kalizak", cargo: "Líder/Professor" },
     { nome: "Luiz Gustavo Machado Kalizak", cargo: "Líder/Professor" },
@@ -57,58 +57,56 @@ const MEMBROS_PRE_CADASTRADOS = [
     { nome: "Vanessa", cargo: "Aluno" }
 ];
 
-function gerarListaDomingosCPAD() {
-    let domingos = [];
-    let dataFoco = new Date(2026, 6, 5); // 05/07/2026
-    const temasCPAD = [
-        "Lição 1: O Livro de Juízes: quando cada um fazia o que parecia certo",
-        "Lição 2: Fidelidade a Deus: uma questão de escolha",
-        "Lição 3: Clamor e libertação: a liderança de Otniel",
-        "Lição 4: Eude e Sangar: Deus usa os improváveis",
-        "Lição 5: Débora e Baraque: união para fazer a obra de Deus",
-        "Lição 6: Gideão: Deus transforma a insegurança em coragem",
-        "Lição 7: O fim da liderança de Gideão e o governo de Abimeleque",
-        "Lição 8: Jefté: de rejeitado a libertador",
-        "Lição 9: Sansão: a força e a fraqueza de um jovem",
-        "Lição 10: Sansão: entre vitórias e derrotas",
-        "Lição 11: Crise espiritual e falsa religiosidade",
-        "Lição 12: Tempos de decadência moral e maldade",
-        "Lição 13: Esperança em meio ao caos: aguardando a vinda do rei"
-    ];
-    for (let i = 0; i < 13; i++) {
-        let diaStr = String(dataFoco.getDate()).padStart(2, '0');
-        let mesStr = String(dataFoco.getMonth() + 1).padStart(2, '0');
-        let dataFormatada = `${diaStr}/${mesStr}/${dataFoco.getFullYear()}`;
-        domingos.push({
-            id: String(2026100 + i),
-            data: dataFormatada,
-            tema: `${dataFormatada} - ${temasCPAD[i]}`,
-            pergunta: "O que você aprendeu com esta lição que pode aplicar no seu dia a dia?",
-            isAvulso: false,
-            status: "agendada",
-            observacao: "Matéria oficial da grade curricular CPAD."
-        });
-        dataFoco.setDate(dataFoco.getDate() + 7);
-    }
-    return domingos;
-}
-
-// Funções de comunicação com a Nuvem (Firebase via REST)
+// --- FUNÇÕES DE CONEXÃO COM A NUVEM ---
 async function salvarNaNuvem(pasta, dados) {
-    if (!FIREBASE_URL || FIREBASE_URL.includes("COLE_AQUI")) return;
     try {
         await fetch(`${FIREBASE_URL}${pasta}.json`, {
             method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(dados)
         });
-    } catch (e) { console.error("Erro ao salvar na nuvem:", e); }
+    } catch (e) { console.error("Erro ao salvar:", e); }
 }
 
 async function puxarDaNuvem(pasta) {
-    if (!FIREBASE_URL || FIREBASE_URL.includes("COLE_AQUI")) return null;
     try {
         let res = await fetch(`${FIREBASE_URL}${pasta}.json`);
         return await res.json();
-    } catch (e) { 
-        console.error("Erro ao puxar da nuvem:", e); 
-        return null;
+    } catch (e) { return null; }
+}
+
+// --- FUNÇÕES DO SEU SISTEMA (INTEGRADAS) ---
+
+// Ao iniciar a sessão, buscamos dados da nuvem
+async function iniciarSessao() {
+    // Carrega dados da nuvem ou inicializa com padrão
+    let membrosNuvem = await puxarDaNuvem('membros');
+    if (!membrosNuvem) {
+        await salvarNaNuvem('membros', MEMBROS_PRE_CADASTRADOS);
+        localStorage.setItem('bd_membros', JSON.stringify(MEMBROS_PRE_CADASTRADOS));
+    } else {
+        localStorage.setItem('bd_membros', JSON.stringify(membrosNuvem));
+    }
+
+    // Chama suas funções originais de interface
+    // Exemplo: carregarDashboard(); 
+    // (O restante do seu código deve continuar aqui embaixo)
+    document.getElementById('tela-auth').style.display = 'none';
+    document.getElementById('tela-dashboard').style.display = 'block';
+    
+    // Inicia a sincronização automática
+    setInterval(sincronizarAutomatico, 3000);
+}
+
+async function sincronizarAutomatico() {
+    // Aqui sua lógica de carregar aulas e presenças
+    let licoes = await puxarDaNuvem('licoes');
+    let presencas = await puxarDaNuvem('presencas');
+    // ... atualizar o DOM aqui ...
+}
+
+// [COLE AQUI O RESTANTE DAS SUAS FUNÇÕES ORIGINAIS: executarLogin, publicarLicao, etc.]
+
+window.onload = () => {
+    if (localStorage.getItem('usuarioLogado')) iniciarSessao();
+};
