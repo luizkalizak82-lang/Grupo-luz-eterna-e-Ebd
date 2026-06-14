@@ -2,47 +2,51 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Portal Luz Eterna | Escola Bíblica Dominical</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Luz Eterna</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-container">
-        <header><h1>Luz Eterna</h1></header>
+    <header>
+        <h1 class="logo">Luz Eterna</h1>
+    </header>
 
-        <section id="login-screen">
-            <input type="text" id="user-name" placeholder="Nome (igual WhatsApp)">
-            <button onclick="fazerLogin()">Entrar no Painel</button>
-        </section>
+    <section id="login-screen">
+        <input type="text" id="user-name" placeholder="Nome igual ao WhatsApp">
+        <button onclick="fazerLogin()">Entrar no Painel</button>
+    </section>
 
-        <section id="dashboard" style="display:none;">
-            <nav>
-                <button onclick="mostrar('aula')">Aula Hoje</button>
-                <button onclick="mostrar('ebds')">Lições EBD</button>
-                <button onclick="mostrar('diario')">Diário</button>
-                <button id="tab-admin" style="display:none;" onclick="mostrar('admin')">Admin</button>
-            </nav>
+    <section id="dashboard" style="display:none;">
+        <nav>
+            <button onclick="mostrar('aula')">Aula Hoje</button>
+            <button onclick="mostrar('ebds')">Lições EBD</button>
+            <button onclick="mostrar('diario')">Diário de Classe</button>
+            <button id="tab-admin" style="display:none;" onclick="mostrar('admin')">Admin</button>
+        </nav>
 
-            <div id="aula" class="aba">
-                <h2 id="titulo-aula">Aguardando início...</h2>
-                <div id="timer">Tempo: --:--</div>
-                <button id="btn-presenca" onclick="registrarPresenca()">Confirmar Presença</button>
-                <textarea id="resp-aluno" placeholder="Responda a pergunta da aula..."></textarea>
-                <button onclick="enviarResposta()">Enviar Resposta</button>
-                <div class="barra-externa"><div id="barra-progresso"></div></div>
-                <p id="status-texto">0/60 presentes</p>
+        <div id="aula" class="aba">
+            <h2 id="titulo-aula">Aguardando início...</h2>
+            <div class="timer-area">
+                <p>Cronômetro</p>
+                <div id="timer">00:00</div>
             </div>
+            <button id="btn-presenca" onclick="registrarPresenca()">Confirmar Presença</button>
+            <textarea id="resp-aluno" placeholder="Resposta final da aula..." disabled></textarea>
+            <button onclick="enviarResposta()">Enviar Resposta Final</button>
+            <div class="barra-externa"><div id="barra-progresso"></div></div>
+            <p id="status-texto">0/60 presentes</p>
+        </div>
 
-            <div id="ebds" class="aba" style="display:none;"></div>
-            <div id="diario" class="aba" style="display:none;"><h3>Lista de Jovens</h3><ul id="lista-alunos"></ul></div>
-            
-            <div id="admin" class="aba" style="display:none;">
-                <input id="in-titulo" placeholder="Título da Lição">
-                <textarea id="in-versiculos" placeholder="Versículos"></textarea>
-                <textarea id="in-pergunta" placeholder="Pergunta da aula"></textarea>
-                <button onclick="publicarAula()">Publicar Lição</button>
-            </div>
-        </section>
-    </div>
+        <div id="ebds" class="aba" style="display:none;"><h3>Lições do Trimestre</h3><div id="lista-licoes"></div></div>
+        <div id="diario" class="aba" style="display:none;"><h3>Diário de Classe</h3><ul id="lista-alunos"></ul></div>
+        <div id="admin" class="aba" style="display:none;">
+            <h3>Publicação</h3>
+            <input id="in-titulo" placeholder="Título">
+            <textarea id="in-versiculos" placeholder="Versículos"></textarea>
+            <textarea id="in-pergunta" placeholder="Pergunta da aula"></textarea>
+            <button onclick="publicarAula()">Publicar Aula</button>
+        </div>
+    </section>
     <script type="module" src="script.js"></script>
 </body>
 </html>
