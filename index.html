@@ -1,45 +1,150 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal EBD - Jovens Luz Eterna</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <title>Portal EBD Luz Eterna</title>
 </head>
 <body>
-    <div id="tela-auth" class="tela ativa">
-        <div class="card">
-            <h2>Portal EBD - Luz Eterna</h2>
-            <input type="text" id="login-nome" placeholder="Seu Nome Completo">
-            <button onclick="executarLogin()">Entrar</button>
-            <button onclick="mostrarTela('tela-cadastro')" class="btn-secundario">Cadastrar Novo Aluno</button>
-        </div>
-    </div>
 
-    <div id="tela-cadastro" class="tela" style="display:none;">
-        <div class="card">
-            <h2>Novo Cadastro</h2>
-            <input type="text" id="novo-nome" placeholder="Nome Completo">
-            <button onclick="cadastrarAluno()">Confirmar Cadastro</button>
-            <button onclick="mostrarTela('tela-auth')" class="btn-secundario">Voltar</button>
-        </div>
-    </div>
+    <header>
+        <div class="header-container">
+            <nav id="nav-principal" style="display: none;">
+                <div class="nav-links">
+                    <a onclick="navegarPara('tela-dashboard')">Início</a>
+                    <a onclick="navegarPara('tela-licoes')">Cronograma EBD</a>
+                    <a onclick="navegarPara('tela-membros')">Diário de Classe</a>
+                </div>
+                <div class="user-status-bar">
+                    Olá, <span id="nome-usuario-logado">Usuário</span> 
+                    <span id="badge-perfil" class="badge-role"></span>
+                    <button class="btn-logout" onclick="fazerLogout()">Sair</button>
+                </div>
+            </nav>
 
-    <div id="tela-dashboard" class="tela" style="display:none;">
-        <nav>
-            <button onclick="mudarConteudo('cronograma')">Cronograma</button>
-            <button onclick="mudarConteudo('diario')">Diário</button>
-            <button onclick="fazerLogout()">Sair</button>
-        </nav>
-        
-        <div id="painel-professor" style="display:none;" class="card">
-            <h3>Gerenciar Aulas</h3>
-            <input type="text" id="novo-tema" placeholder="Título da Nova Lição">
-            <button onclick="adicionarLicao()">Adicionar Lição</button>
+            <div class="logo-area-central">
+                <h1>Luz Eterna</h1>
+                <p>Portal da Escola Bíblica Dominical</p>
+            </div>
         </div>
-        
-        <div id="feed-licoes" class="conteudo"></div>
-        <div id="lista-oficial-membros" class="conteudo" style="display:none;"></div>
-    </div>
+    </header>
+
+    <main>
+        <section id="tela-auth" class="tela ativa">
+            <div class="auth-container card">
+                <div id="auth-login-view">
+                    <h2>Entrar no Portal</h2>
+                    <p class="subtitle">Digite seu nome completo para acessar as aulas</p>
+                    <div id="login-alert" class="alert alert-error" style="display: none;"></div>
+                    <div class="form-group">
+                        <label for="login-nome">Seu Nome Completo</label>
+                        <input type="text" id="login-nome" placeholder="Nome e Sobrenome sem abreviações">
+                    </div>
+                    <button class="btn-principal" onclick="executarLogin()">Entrar na Classe</button>
+                    <div class="auth-toggle">
+                        Ainda não está na lista? <span onclick="alternarAbasAuth(true)">Cadastre-se aqui</span>
+                    </div>
+                </div>
+
+                <div id="auth-cadastro-view" style="display: none;">
+                    <h2>Criar Cadastro</h2>
+                    <p class="subtitle">Registre seu nome oficial no grupo Luz Eterna</p>
+                    <div id="cadastro-alert" class="alert alert-error" style="display: none;"></div>
+                    <div class="form-group">
+                        <label for="cadastro-nome">Nome Completo</label>
+                        <input type="text" id="cadastro-nome" placeholder="Ex: Gabriel Silva Santos">
+                    </div>
+                    <button class="btn-principal" onclick="executarCadastro()">Confirmar Registro</button>
+                    <div class="auth-toggle">
+                        Já possui cadastro? <span onclick="alternarAbasAuth(false)">Fazer login</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tela-dashboard" class="tela">
+            <div class="dashboard-grid" id="dashboard-dinamico-conteudo">
+                </div>
+        </section>
+
+        <section id="tela-licoes" class="tela">
+            
+            <div class="card card-admin-action" id="painel-cadastro-licao" style="display: none;">
+                <h2>📝 Gerenciamento de Aulas: Inserir Conteúdo Dominical</h2>
+                <p style="color: var(--dourado-claro); font-size: 0.9rem; margin-bottom: 1.2rem;">Use esta área para publicar o tema da aula, perguntas reflexivas e as anotações do diário de classe.</p>
+                
+                <div class="form-group">
+                    <label for="post-tema">📖 Escolha o Tema ou Assunto</label>
+                    <input type="text" id="post-tema" placeholder="Ex: Lição 3 - Clamor e libertação: a liderança de Otniel">
+                </div>
+                
+                <div class="form-group">
+                    <label for="post-pergunta">✍️ Exercício / Pergunta da Aula</label>
+                    <input type="text" id="post-pergunta" placeholder="O que os alunos devem responder após a ministração?">
+                </div>
+
+                <div class="form-group">
+                    <label for="post-observacao">📋 Anotações e Observações Gerais da Aula</label>
+                    <input type="text" id="post-observacao" placeholder="Fatos relevantes, necessidades de oração detectadas, etc.">
+                </div>
+                
+                <div class="form-group">
+                    <label for="post-status">⚡ Estado Inicial do Conteúdo</label>
+                    <select id="post-status" class="select-custom">
+                        <option value="agendada">📅 Agendada (Apenas visualização do tema pelos alunos)</option>
+                        <option value="aberta">🔓 Aberta para Hoje (Libera chamada eletrônica e exercício)</option>
+                    </select>
+                </div>
+                <button class="btn-principal" onclick="publicarNovaLicao()">🚀 Publicar Aula na Plataforma</button>
+            </div>
+
+            <div class="card metricas-container-box">
+                <h2>📊 Frequência Geral de Alunos (Classe Juvenil)</h2>
+                <div class="metricas-flex-grid">
+                    <div class="metrica-item">
+                        <span class="metrica-num" id="txt-meta-alunos">50</span>
+                        <span class="metrica-lbl">Alunos na Meta</span>
+                    </div>
+                    <div class="metrica-item">
+                        <span class="metrica-num" id="txt-presentes-hoje">0</span>
+                        <span class="metrica-lbl">Presentes Hoje</span>
+                    </div>
+                    <div class="metrica-item">
+                        <span class="metrica-num" id="txt-porcentagem-hoje">0%</span>
+                        <span class="metrica-lbl">Aproveitamento</span>
+                    </div>
+                </div>
+                <div class="metric-container">
+                    <div class="metric-bar" id="barra-progresso-frequencia"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📅 Cronograma Oficial e Registro de Matérias</h2>
+                <p style="color: var(--dourado-claro); margin-bottom: 1.5rem; font-size: 0.9rem;">As lições programadas aparecem listadas abaixo. A chamada fica restrita às aulas marcadas como "Aberta para Hoje".</p>
+                <div id="feed-licoes">
+                    </div>
+            </div>
+        </section>
+
+        <section id="tela-membros" class="tela">
+            <div class="card">
+                <h2>👥 Diário de Classe: Lista Oficial de Membros</h2>
+                <p style="color: var(--dourado-claro); font-size: 0.9rem; margin-bottom: 1rem;">Professores e Líderes oficiais possuem permissões administrativas automaticamente.</p>
+                <div class="membros-list" id="lista-oficial-membros"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Grupo de Jovens Luz Eterna - Escola Bíblica Dominical</p>
+        <p class="footer-sub">Mapeamento Integrado de Frequência e Crescimento Bíblico</p>
+    </footer>
+
     <script src="script.js"></script>
 </body>
 </html>
