@@ -1,11 +1,11 @@
 // ==========================================================================
-// PORTAL EBD LUZ ETERNA - CÓDIGO INTEGRADO COM BANCO DE DADOS
+// PORTAL EBD LUZ ETERNA - CÓDIGO FINAL INTEGRADO
 // ==========================================================================
 
 const FIREBASE_URL = "https://ebd-luz-eterna-default-rtdb.firebaseio.com/";
 
-// --- LISTA DE MEMBROS (MANTIDA ORIGINAL) ---
-const MEMBROS_PRE_CADASTRADOS = [
+// Lista Completa de Membros
+const MEMBROS_BASE = [
     { nome: "Luiz Kalizak", cargo: "Líder/Professor" },
     { nome: "Luiz Gustavo Machado Kalizak", cargo: "Líder/Professor" },
     { nome: "Michael", cargo: "Líder/Professor" },
@@ -57,55 +57,93 @@ const MEMBROS_PRE_CADASTRADOS = [
     { nome: "Vanessa", cargo: "Aluno" }
 ];
 
-// --- FUNÇÕES DE CONEXÃO COM A NUVEM ---
-async function salvarNaNuvem(pasta, dados) {
+// --- FUNÇÕES DE NUVEM ---
+async function salvar(pasta, dados) {
     try {
         await fetch(`${FIREBASE_URL}${pasta}.json`, {
             method: 'PUT',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(dados)
         });
-    } catch (e) { console.error("Erro ao salvar:", e); }
+    } catch (e) { console.error("Erro na Nuvem:", e); }
 }
 
-async function puxarDaNuvem(pasta) {
+async function puxar(pasta) {
     try {
         let res = await fetch(`${FIREBASE_URL}${pasta}.json`);
         return await res.json();
     } catch (e) { return null; }
 }
 
-// --- FUNÇÕES DO SEU SISTEMA (INTEGRADAS) ---
+// --- AUTENTICAÇÃO E LOGIN ---
+function executarLogin() {
+    const nomeInput = document.getElementById('login-nome').value.trim();
+    let membros = JSON.parse(localStorage.getItem('bd_membros') || "[]");
+    let usuario = membros.find(m => m.nome.toLowerCase() === nomeInput.toLowerCase());
+    
+    if (!usuario) return alert("Nome não localizado na lista de classe.");
+    
+    localStorage.setItem('usuarioLogado', usuario.nome);
+    localStorage.setItem('perfil', usuario.cargo === "Líder/Professor" ? 'professor' : 'aluno');
+    window.location.reload();
+}
 
-// Ao iniciar a sessão, buscamos dados da nuvem
+// --- SINCRONIZAÇÃO E INTERFACE ---
 async function iniciarSessao() {
-    // Carrega dados da nuvem ou inicializa com padrão
-    let membrosNuvem = await puxarDaNuvem('membros');
+    // Garante que os membros estejam no Firebase
+    let membrosNuvem = await puxar('membros');
     if (!membrosNuvem) {
-        await salvarNaNuvem('membros', MEMBROS_PRE_CADASTRADOS);
-        localStorage.setItem('bd_membros', JSON.stringify(MEMBROS_PRE_CADASTRADOS));
+        await salvar('membros', MEMBROS_BASE);
+        localStorage.setItem('bd_membros', JSON.stringify(MEMBROS_BASE));
     } else {
         localStorage.setItem('bd_membros', JSON.stringify(membrosNuvem));
     }
-
-    // Chama suas funções originais de interface
-    // Exemplo: carregarDashboard(); 
-    // (O restante do seu código deve continuar aqui embaixo)
+    
+    // Mostra o dashboard
     document.getElementById('tela-auth').style.display = 'none';
     document.getElementById('tela-dashboard').style.display = 'block';
     
-    // Inicia a sincronização automática
-    setInterval(sincronizarAutomatico, 3000);
+    // Inicia a atualização automática
+    setInterval(renderizarTudo, 3000);
+    renderizarTudo();
 }
 
-async function sincronizarAutomatico() {
-    // Aqui sua lógica de carregar aulas e presenças
-    let licoes = await puxarDaNuvem('licoes');
-    let presencas = await puxarDaNuvem('presencas');
-    // ... atualizar o DOM aqui ...
+async function renderizarTudo() {
+    const licoes = await puxar('licoes') || [];
+    const presencas = await puxar('presencas') || {};
+    const container = document.getElementById('feed-licoes');
+    if (!container) return;
+
+    // Renderiza o cronograma (usando a lógica que você já tinha)
+    container.innerHTML = licoes.map(licao => `
+        <div class="card-aula" style="border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 8px;">
+            <h3>${licao.tema}</h3>
+            <p>Status: <strong>${licao.status}</strong></p>
+            ${localStorage.getItem('perfil') === 'professor' ? 
+                `<button onclick="alterarStatus('${licao.id}', 'aberta')">Abrir Presença</button>` : 
+                (licao.status === 'aberta' ? `<button onclick="confirmarPresenca('${licao.id}')">Confirmar Presença</button>` : '')}
+        </div>
+    `).join('');
 }
 
-// [COLE AQUI O RESTANTE DAS SUAS FUNÇÕES ORIGINAIS: executarLogin, publicarLicao, etc.]
+async function confirmarPresenca(licaoId) {
+    const usuario = localStorage.getItem('usuarioLogado');
+    let presencas = await puxar('presencas') || {};
+    if (!presencas[licaoId]) presencas[licaoId] = [];
+    if (!presencas[licaoId].includes(usuario)) {
+        presencas[licaoId].push(usuario);
+        await salvar('presencas', presencas);
+        alert("Presença confirmada!");
+        renderizarTudo();
+    }
+}
+
+async function alterarStatus(licaoId, novoStatus) {
+    let licoes = await puxar('licoes') || [];
+    licoes = licoes.map(l => l.id === licaoId ? {...l, status: novoStatus} : l);
+    await salvar('licoes', licoes);
+    renderizarTudo();
+}
 
 window.onload = () => {
     if (localStorage.getItem('usuarioLogado')) iniciarSessao();
