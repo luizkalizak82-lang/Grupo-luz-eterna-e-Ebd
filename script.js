@@ -1,47 +1,43 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-import { getDatabase, ref, onValue, update, get, child, set } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+import { getDatabase, ref, get, set, child, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-const firebaseConfig = { databaseURL: "https://ebd-luz-eterna-default-rtdb.firebaseio.com/" };
-const db = getDatabase(initializeApp(firebaseConfig));
+const db = getDatabase(initializeApp({ databaseURL: "https://ebd-luz-eterna-default-rtdb.firebaseio.com/" }));
 
-// Alterna entre Login e Cadastro
-window.alternarForm = (formType) => {
-    if (formType === 'cadastro') {
-        document.getElementById('login-form').style.display = 'none';
-        document.getElementById('cadastro-form').style.display = 'block';
-    } else {
-        document.getElementById('cadastro-form').style.display = 'none';
-        document.getElementById('login-form').style.display = 'block';
-    }
-};
-
-window.fazerLogin = async () => {
+window.entrar = async () => {
     const nome = document.getElementById('user-name').value;
     const snap = await get(child(ref(db), `membros/${nome}`));
     if (snap.exists()) {
         localStorage.setItem('usuario', nome);
-        const perfil = snap.val().perfil;
-        document.getElementById('login-screen').style.display = 'none';
+        if(snap.val().perfil === 'professor') document.getElementById('admin-panel').style.display = 'block';
+        document.getElementById('login-area').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
-        if (perfil === 'professor') document.getElementById('tab-admin').style.display = 'block';
-    } else alert("Nome não autorizado.");
+    } else {
+        await set(ref(db, `membros/${nome}`), { perfil: 'aluno' });
+        window.entrar();
+    }
 };
 
-window.solicitarCadastro = async () => {
-    const nome = document.getElementById('new-name').value;
-    
-    // 1. Cadastra no banco de dados com perfil 'aluno'
-    await set(ref(db, `membros/${nome}`), {
-        perfil: 'aluno'
+window.publicarAula = () => {
+    set(ref(db, 'aula_ativa'), {
+        titulo: document.getElementById('in-titulo').value,
+        texto: document.getElementById('in-texto').value,
+        pergunta: document.getElementById('in-pergunta').value
     });
-    
-    // 2. Faz o login automático
-    localStorage.setItem('usuario', nome);
-    localStorage.setItem('perfil', 'aluno');
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'block';
-    
-    alert(`Cadastro realizado com sucesso, ${nome}! Bem-vindo ao Luz Eterna.`);
+    alert("Aula publicada!");
 };
 
-// ... restante das funções (mostrar, publicarAula, onValue) permanecem iguais ...
+window.abrir = (aba) => {
+    const div = document.getElementById('conteudo-principal');
+    if(aba === 'aula') {
+        onValue(ref(db, 'aula_ativa'), (s) => {
+            const d = s.val();
+            div.innerHTML = `<h3>${d.titulo}</h3><p>${d.texto}</p><p>Pergunta: ${d.pergunta}</p>`;
+        });
+    } else if(aba === 'diario') {
+        get(ref(db, 'membros')).then(s => {
+            let html = "<ul>";
+            s.forEach(c => html += `<li>${c.key}</li>`);
+            div.innerHTML = "<h3>Membros</h3>" + html + "</ul>";
+        });
+    }
+};
