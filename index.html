@@ -2,30 +2,29 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Luz Eterna</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Luz Eterna - Portal EBD</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f9f9f9; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #b8860b; text-align: center; border-bottom: 2px solid #b8860b; padding-bottom: 10px; }
+        .lesson-card { border: 1px solid #eee; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 5px solid #b8860b; }
+        .date { font-weight: bold; color: #555; }
+        .status { float: right; background: #b8860b; color: white; padding: 5px 10px; border-radius: 5px; font-size: 0.8em; }
+    </style>
 </head>
 <body>
-    <header>
-        <h1 class="logo">Luz Eterna</h1>
-        <div class="infinito">&infin;</div>
-    </header>
 
-    <section id="login-area" class="card">
-        <input type="text" id="user-name" placeholder="Nome igual ao WhatsApp">
-        <button class="gold" onclick="entrar()">Entrar no Portal</button>
-    </section>
+<div class="container">
+    <h1>Luz Eterna - Portal EBD</h1>
+    <p>Bem-vindo, <strong>Paloma Pezzini</strong></p>
 
-    <section id="dashboard" style="display:none;">
-        <nav id="menu-principal">
-            <button onclick="abrir('aula')">Aula Hoje</button>
-            <button onclick="abrir('ebds')">Lições EBD</button>
-            <button onclick="abrir('diario')">Diário</button>
-            <button id="btn-admin" class="gold prof-only" style="display:none;" onclick="abrir('admin')">Painel Professor</button>
-        </nav>
-        <div id="conteudo-principal"></div>
-    </section>
-    <script type="module" src="script.js"></script>
+    <div class="lesson-card">
+        <span class="status">AGENDADA</span>
+        <div class="date">05/07/2026</div>
+        <div><strong>Lição 1:</strong> O Livro de Juízes: quando cada um faz o que parece certo</div>
+    </div>
+
+    </div>
+
 </body>
 </html>
