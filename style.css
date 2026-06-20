@@ -1,126 +1,62 @@
-/* ==========================================================================
-   IDENTIDADE VISUAL: LUZ ETERNA (VERSÃO FINAL UNIFICADA)
-   ========================================================================== */
 :root {
     --preto-profundo: #0c0c0c;
     --cinza-card: #161616;
     --dourado-intenso: #D4AF37;
     --dourado-brilho: #F3E5AB;
-    --gradiente-dourado: linear-gradient(90deg, #b8860b, #D4AF37, #f3e5ab, #D4AF37, #b8860b);
-    --branco: #FFFFFF;
+    --gradiente-dourado: linear-gradient(135deg, #b8860b, #D4AF37, #f3e5ab);
 }
 
-/* Fundo com imagem de referência e camada de sobreposição */
 body {
     margin: 0;
     min-height: 100vh;
     font-family: 'Inter', sans-serif;
-    background: url('1000000531.png') no-repeat center center fixed;
-    background-size: cover;
-    color: var(--branco);
+    background: var(--preto-profundo);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-body::before {
-    content: "";
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.75); /* Escurecimento para legibilidade */
-    z-index: -1;
-}
+header { padding: 30px 0; text-align: center; }
 
-/* Header */
-header {
-    background-color: #050505;
-    border-bottom: 3px solid var(--dourado-intenso);
-    padding: 1.5rem;
-    text-align: center;
-}
-
-/* Logo Estilizada */
 .logo-img { 
-    max-width: 250px; 
-    margin: 10px auto; 
+    max-width: 300px; 
+    height: auto; 
     display: block; 
+    margin: 0 auto; 
 }
 
-.logo-area-central h1 {
-    font-family: 'Great Vibes', cursive;
-    font-size: 4rem;
-    background: var(--gradiente-dourado);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin: 0;
-}
-
-.logo-area-central p {
-    font-family: 'Brush Script MT', cursive;
-    font-size: 1.4rem;
-    color: var(--dourado-brilho);
-    margin-top: -5px;
-}
-
-/* Container de Autenticação (Cards) */
 .auth-card {
-    background: rgba(22, 22, 22, 0.95);
-    border: 1px solid rgba(212, 175, 55, 0.3);
+    background: var(--cinza-card);
+    border: 1px solid #333;
     border-radius: 12px;
-    padding: 2.5rem;
-    width: 320px;
-    margin: 40px auto;
+    padding: 40px;
+    width: 300px;
     text-align: center;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    margin-top: 20px;
 }
 
-/* Botões */
+input {
+    width: 100%; padding: 12px; margin: 10px 0;
+    background: #000; border: 1px solid #444; color: white;
+    border-radius: 4px; box-sizing: border-box;
+}
+
 .btn-entrar {
-    background: var(--gradiente-dourado);
-    color: #000;
-    border: none;
-    font-weight: bold;
-    padding: 12px;
-    width: 100%;
-    cursor: pointer;
-    border-radius: 4px;
-    text-transform: uppercase;
+    width: 100%; padding: 12px; background: var(--gradiente-dourado);
+    border: none; font-weight: bold; cursor: pointer; color: #000;
 }
-
-.btn-entrar:hover { filter: brightness(1.2); }
 
 .btn-cadastro {
-    background: none;
-    border: 1px solid #444;
-    color: #888;
-    margin-top: 15px;
-    width: 100%;
-    padding: 10px;
-    cursor: pointer;
-    font-size: 0.9rem;
+    background: none; border: 1px solid #444; color: #888;
+    margin-top: 15px; width: 100%; padding: 10px; cursor: pointer;
 }
 
-/* Inputs */
-input {
-    background: #000;
-    border: 1px solid #444;
-    color: white;
-    padding: 12px;
-    width: 100%;
-    margin: 10px 0;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-/* Rodapé */
 footer {
-    background-color: #050505;
-    color: var(--dourado-brilho);
-    border-top: 3px solid var(--dourado-intenso);
-    text-align: center;
-    padding: 1.5rem;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
+    margin-top: auto; padding: 20px; color: var(--dourado-intenso);
+    font-size: 0.9rem; text-align: center;
 }
 
-/* Controle de Telas */
 .tela { display: none; }
 .tela.ativa { display: block; }
