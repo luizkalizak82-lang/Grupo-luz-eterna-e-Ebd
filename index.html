@@ -4,127 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal EBD - Jovens Luz Eterna</title>
-    <!-- Importação da fonte cursiva para o Logo -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- CABEÇALHO DO PORTAL (AZUL E DOURADO CENTRALIZADO) -->
     <header>
         <div class="header-container">
-            <!-- Menu de navegação superior (Aparece após o login) -->
+            <div class="logo-area-central">
+                <h1>Luz Eterna</h1>
+                <p>grupo de jovens</p>
+            </div>
+
             <nav id="nav-principal" style="display: none;">
                 <div class="nav-links">
                     <a onclick="navegarPara('tela-dashboard')">Início</a>
-                    <a onclick="navegarPara('tela-licoes')">Matérias & Atividades</a>
+                    <a onclick="navegarPara('tela-licoes')">Matérias</a>
                     <a onclick="navegarPara('tela-membros')">Membros</a>
                 </div>
                 <div class="user-status-bar">
-                    Olá, <span id="nome-usuario-logado">Usuário</span> 
+                    <span id="nome-usuario-logado">Usuário</span> 
                     <span id="badge-perfil" class="badge-role"></span>
                     <button class="btn-logout" onclick="fazerLogout()">Sair</button>
                 </div>
             </nav>
-
-            <!-- Logo Gigante Cursiva -->
-            <div class="logo-area-central">
-                <h1>Luz Eterna</h1>
-                <p>Portal da Escola Bíblica Dominical</p>
-            </div>
         </div>
     </header>
 
-    <!-- CONTEÚDO PRINCIPAL -->
     <main>
-
-        <!-- TELA 1: AUTENTICAÇÃO (LOGIN / CADASTRO) -->
         <section id="tela-auth" class="tela ativa">
             <div class="auth-container">
-                <!-- Login -->
                 <div id="auth-login-view">
-                    <h2>Entrar no Portal</h2>
-                    <p class="subtitle">Acesse para marcar sua presença ou gerenciar a aula</p>
+                    <h2>Entrar</h2>
+                    <p class="subtitle">Acesse para registrar sua presença</p>
                     <div id="login-alert" class="alert alert-error" style="display: none;"></div>
                     <div class="form-group">
-                        <label for="login-nome">Seu Nome Completo</label>
-                        <input type="text" id="login-nome" placeholder="Digite seu nome cadastrado">
+                        <label>Nome Completo</label>
+                        <input type="text" id="login-nome">
                     </div>
-                    <button class="btn-principal" onclick="executarLogin()">Entrar na Classe</button>
-                    <div class="auth-toggle">
-                        Ainda não está na lista? <span onclick="alternarAbasAuth(true)">Cadastre-se aqui</span>
-                    </div>
+                    <button class="btn-principal" onclick="executarLogin()">Entrar</button>
+                    <p style="margin-top:1rem; text-align:center; cursor:pointer;" onclick="alternarAbasAuth(true)">Não tem cadastro? <b>Cadastre-se</b></p>
                 </div>
 
-                <!-- Cadastro -->
                 <div id="auth-cadastro-view" style="display: none;">
-                    <h2>Criar Cadastro</h2>
-                    <p class="subtitle">Registre-se no grupo de jovens Luz Eterna</p>
+                    <h2>Cadastro</h2>
                     <div id="cadastro-alert" class="alert alert-error" style="display: none;"></div>
                     <div class="form-group">
-                        <label for="cadastro-nome">Nome Completo</label>
-                        <input type="text" id="cadastro-nome" placeholder="Ex: Gabriel Silva Santos">
+                        <label>Nome Completo</label>
+                        <input type="text" id="cadastro-nome">
                     </div>
                     <button class="btn-principal" onclick="executarCadastro()">Confirmar Registro</button>
-                    <div class="auth-toggle">
-                        Já possui cadastro? <span onclick="alternarAbasAuth(false)">Fazer login</span>
-                    </div>
+                    <p style="margin-top:1rem; text-align:center; cursor:pointer;" onclick="alternarAbasAuth(false)">Voltar ao Login</p>
                 </div>
             </div>
         </section>
 
-        <!-- TELA 2: DASHBOARD DINÂMICO (CONTEÚDO CARREGADO VIA JS CONFORME PERFIL) -->
         <section id="tela-dashboard" class="tela">
-            <div id="dashboard-alert" class="alert alert-success" style="display: none;"></div>
-            <div class="dashboard-grid" id="dashboard-dinamico-conteudo">
-                <!-- Preenchido dinamicamente pelo script.js -->
-            </div>
+            <div id="dashboard-dinamico-conteudo"></div>
         </section>
 
-        <!-- TELA 3: MATÉRIAS E ATIVIDADES -->
         <section id="tela-licoes" class="tela">
-            <!-- Painel exclusivo do Professor para adicionar lições (oculto para alunos) -->
-            <div class="card card-admin-action" id="painel-cadastro-licao" style="display: none;">
-                <h2>➕ Publicar Nova Lição / Atividade</h2>
-                <div class="form-group">
-                    <label for="post-tema">Tema da Lição</label>
-                    <input type="text" id="post-tema" placeholder="Ex: Lição 1 - A Importância da Palavra">
-                </div>
-                <div class="form-group">
-                    <label for="post-pergunta">Pergunta da Atividade do Dia</label>
-                    <input type="text" id="post-pergunta" placeholder="Escreva aqui a pergunta baseada na lição">
-                </div>
-                <button class="btn-principal" onclick="publicarNovaLicao()">Publicar no Portal</button>
-            </div>
-
-            <!-- Listagem que ambos os perfis visualizam -->
-            <div class="card">
-                <h2>📚 Linha do Tempo: Lições e Questionários</h2>
-                <div id="feed-licoes">
-                    <!-- Lições postadas aparecerão aqui -->
-                </div>
-            </div>
+            <div id="painel-cadastro-licao" style="display: none;"></div>
+            <div id="feed-licoes"></div>
         </section>
-
-        <!-- TELA 4: DIÁRIO DE CLASSE / MEMBROS -->
-        <section id="tela-membros" class="tela">
-            <div class="card">
-                <h2>👥 Lista de Membros Cadastrados</h2>
-                <p class="view-desc">Abaixo constam os perfis e o controle geral de acessos.</p>
-                <div class="membros-list" id="lista-oficial-membros">
-                    <!-- Injetado via Javascript -->
-                </div>
-            </div>
-        </section>
-
     </main>
 
-    <!-- RODAPÉ -->
     <footer>
-        <p>&copy; 2026 Grupo de Jovens Luz Eterna - Escola Bíblica Dominical</p>
-        <p class="footer-sub">Painel de Acompanhamento Espiritual e Assiduidade</p>
+        <p>&copy; 2026 Grupo de Jovens Luz Eterna</p>
     </footer>
 
     <script src="script.js"></script>
