@@ -2,29 +2,35 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Luz Eterna - Portal EBD</title>
-    <style>
-        body { font-family: sans-serif; background-color: #f9f9f9; color: #333; margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { color: #b8860b; text-align: center; border-bottom: 2px solid #b8860b; padding-bottom: 10px; }
-        .lesson-card { border: 1px solid #eee; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 5px solid #b8860b; }
-        .date { font-weight: bold; color: #555; }
-        .status { float: right; background: #b8860b; color: white; padding: 5px 10px; border-radius: 5px; font-size: 0.8em; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EBD Luz Eterna</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container">
-    <h1>Luz Eterna - Portal EBD</h1>
-    <p>Bem-vindo, <strong>Paloma Pezzini</strong></p>
-
-    <div class="lesson-card">
-        <span class="status">AGENDADA</span>
-        <div class="date">05/07/2026</div>
-        <div><strong>Lição 1:</strong> O Livro de Juízes: quando cada um faz o que parece certo</div>
+    <div id="login-section" class="container">
+        <img src="logo.png" alt="Logo Luz Eterna" class="logo-grande">
+        <h2>Acesso ao Sistema</h2>
+        <input type="text" id="user" placeholder="Nome de usuário">
+        <input type="password" id="pass" placeholder="Senha">
+        <button onclick="fazerLogin()">ENTRAR</button>
     </div>
 
+    <div id="app-section" class="container" style="display:none;">
+        <header>
+            <img src="logo.png" alt="Logo" class="logo-pequena">
+            <nav>
+                <button onclick="mostrar('licoes')">Lições</button>
+                <button onclick="mostrar('avisos')">Avisos</button>
+                <button onclick="mostrar('eventos')">Eventos</button>
+                <button onclick="logout()" class="btn-sair">Sair</button>
+            </nav>
+        </header>
+
+        <main id="conteudo-dinamico">
+            </main>
     </div>
 
+    <script src="script.js"></script>
 </body>
 </html>
