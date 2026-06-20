@@ -1,70 +1,97 @@
 /* ==========================================================================
-   IDENTIDADE VISUAL: LUZ ETERNA
+   IDENTIDADE VISUAL: LUZ ETERNA (DARK MODE PREMIUM)
    ========================================================================== */
 :root {
-    /* Cores extraídas da identidade visual */
-    --preto-profundo: #1a1a1a;
+    --preto-profundo: #0c0c0c;
+    --cinza-card: #161616;
     --dourado-intenso: #D4AF37;
     --dourado-brilho: #F3E5AB;
     --gradiente-dourado: linear-gradient(90deg, #b8860b, #D4AF37, #f3e5ab, #D4AF37, #b8860b);
     --branco: #FFFFFF;
-    --cinza-fundo: #FDFDFD;
-    --azul-escuro: #1a1a1a; /* Substituindo azul por grafite para combinar com a logo */
-    --sucesso: #27ae60;
 }
 
-/* Aplicando o gradiente no título conforme a logo */
+/* Fundo da página com imagem (conforme solicitado anteriormente) */
+body {
+    background: var(--preto-profundo);
+    color: var(--branco);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    min-height: 100vh;
+}
+
+/* Header escuro com borda dourada */
+header {
+    background-color: #050505;
+    border-bottom: 3px solid var(--dourado-intenso);
+    padding: 2rem 1.5rem;
+    text-align: center;
+}
+
+/* Logo elegante */
 .logo-area-central h1 {
-    font-family: 'Georgia', serif; /* Mantendo elegância */
-    font-size: 4.8rem;
-    font-weight: bold;
+    font-family: 'Great Vibes', cursive;
+    font-size: 4.5rem;
     background: var(--gradiente-dourado);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-    margin-bottom: 0.2rem;
+    margin: 0;
 }
 
-/* Ajuste no subtítulo da logo */
 .logo-area-central p {
-    font-family: 'Brush Script MT', cursive; /* Estilo cursivo similar à imagem */
-    font-size: 1.8rem; 
-    color: var(--preto-profundo);
-    text-transform: none;
-    letter-spacing: 1px;
+    font-family: 'Brush Script MT', cursive;
+    font-size: 1.5rem;
+    color: var(--dourado-brilho);
+    margin-top: -10px;
 }
 
-header {
-    background-color: var(--branco);
-    border-bottom: 3px solid var(--dourado-intenso);
-    padding: 2rem 1.5rem;
+/* Cards (Área de Login e conteúdo) */
+.auth-card, .card {
+    background: var(--cinza-card);
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 2.5rem;
+    color: var(--branco);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
 }
 
+/* Botões com gradiente */
 .btn-principal {
-    background: var(--preto-profundo);
-    color: var(--dourado-intenso);
-    border: 1px solid var(--dourado-intenso);
+    background: var(--gradiente-dourado);
+    color: var(--preto-profundo);
+    border: none;
+    font-weight: bold;
+    padding: 12px;
+    width: 100%;
+    cursor: pointer;
+    border-radius: 4px;
+    text-transform: uppercase;
 }
 
 .btn-principal:hover {
-    background: var(--dourado-intenso);
-    color: var(--branco);
+    filter: brightness(1.2);
 }
 
-/* Ajuste de cards para manter sobriedade */
-.card {
-    border-left: 5px solid var(--dourado-intenso);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+/* Inputs */
+input {
+    background: #000;
+    border: 1px solid #444;
+    color: white;
+    padding: 12px;
+    width: 100%;
+    margin: 10px 0;
+    border-radius: 4px;
+    box-sizing: border-box;
 }
 
-/* Ajuste na barra de progresso para tons de dourado */
-.metric-bar { 
-    background: var(--gradiente-dourado); 
+/* Rodapé */
+footer {
+    background-color: #050505;
+    color: var(--dourado-brilho);
+    border-top: 3px solid var(--dourado-intenso);
+    text-align: center;
+    padding: 1.5rem;
 }
 
-/* Ajuste no rodapé para combinar */
-footer { 
-    background-color: var(--preto-profundo); 
-    color: var(--dourado-claro); 
-    border-top: 3px solid var(--dourado-intenso); 
-}
+/* Telas */
+.tela { display: none; }
+.tela.ativa { display: block; }
