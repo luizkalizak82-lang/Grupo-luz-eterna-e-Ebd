@@ -1,5 +1,5 @@
 /* ==========================================================================
-   IDENTIDADE VISUAL: LUZ ETERNA (DARK MODE PREMIUM)
+   IDENTIDADE VISUAL: LUZ ETERNA (VERSÃO FINAL UNIFICADA)
    ========================================================================== */
 :root {
     --preto-profundo: #0c0c0c;
@@ -10,27 +10,42 @@
     --branco: #FFFFFF;
 }
 
-/* Fundo da página com imagem (conforme solicitado anteriormente) */
+/* Fundo com imagem de referência e camada de sobreposição */
 body {
-    background: var(--preto-profundo);
-    color: var(--branco);
-    font-family: 'Inter', sans-serif;
     margin: 0;
     min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    background: url('1000000531.png') no-repeat center center fixed;
+    background-size: cover;
+    color: var(--branco);
 }
 
-/* Header escuro com borda dourada */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.75); /* Escurecimento para legibilidade */
+    z-index: -1;
+}
+
+/* Header */
 header {
     background-color: #050505;
     border-bottom: 3px solid var(--dourado-intenso);
-    padding: 2rem 1.5rem;
+    padding: 1.5rem;
     text-align: center;
 }
 
-/* Logo elegante */
+/* Logo Estilizada */
+.logo-img { 
+    max-width: 250px; 
+    margin: 10px auto; 
+    display: block; 
+}
+
 .logo-area-central h1 {
     font-family: 'Great Vibes', cursive;
-    font-size: 4.5rem;
+    font-size: 4rem;
     background: var(--gradiente-dourado);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -39,25 +54,27 @@ header {
 
 .logo-area-central p {
     font-family: 'Brush Script MT', cursive;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     color: var(--dourado-brilho);
-    margin-top: -10px;
+    margin-top: -5px;
 }
 
-/* Cards (Área de Login e conteúdo) */
-.auth-card, .card {
-    background: var(--cinza-card);
-    border: 1px solid #333;
+/* Container de Autenticação (Cards) */
+.auth-card {
+    background: rgba(22, 22, 22, 0.95);
+    border: 1px solid rgba(212, 175, 55, 0.3);
     border-radius: 12px;
     padding: 2.5rem;
-    color: var(--branco);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    width: 320px;
+    margin: 40px auto;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.8);
 }
 
-/* Botões com gradiente */
-.btn-principal {
+/* Botões */
+.btn-entrar {
     background: var(--gradiente-dourado);
-    color: var(--preto-profundo);
+    color: #000;
     border: none;
     font-weight: bold;
     padding: 12px;
@@ -67,8 +84,17 @@ header {
     text-transform: uppercase;
 }
 
-.btn-principal:hover {
-    filter: brightness(1.2);
+.btn-entrar:hover { filter: brightness(1.2); }
+
+.btn-cadastro {
+    background: none;
+    border: 1px solid #444;
+    color: #888;
+    margin-top: 15px;
+    width: 100%;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
 }
 
 /* Inputs */
@@ -90,8 +116,11 @@ footer {
     border-top: 3px solid var(--dourado-intenso);
     text-align: center;
     padding: 1.5rem;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
 }
 
-/* Telas */
+/* Controle de Telas */
 .tela { display: none; }
 .tela.ativa { display: block; }
