@@ -1,73 +1,13 @@
-/* Variáveis de cores */
-:root {
-    --dourado: #C5A059;
-    --branco: #FFFFFF;
-    --fundo: #F4F4F4;
-    --texto: #333333;
-}
+body { background-color: #000; color: #fff; font-family: 'Arial', sans-serif; margin: 0; padding: 0; }
+.container { max-width: 800px; margin: 0 auto; padding: 20px; text-align: center; }
 
-body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: var(--fundo);
-    color: var(--texto);
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-}
+/* Login */
+.logo-grande { width: 250px; margin-bottom: 20px; }
+input { display: block; width: 100%; max-width: 300px; margin: 10px auto; padding: 12px; border-radius: 5px; border: 1px solid #FFD700; background: #1a1a1a; color: white; }
+button { padding: 10px 20px; background: #FFD700; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
 
-.container {
-    width: 100%;
-    max-width: 500px; /* Tamanho ideal para visualização em celular */
-    background: var(--branco);
-    padding: 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    min-height: 100vh;
-}
-
-/* Título e Identidade */
-h1 {
-    color: var(--dourado);
-    text-align: center;
-    font-size: 24px;
-    margin-bottom: 5px;
-}
-
-.subtitulo {
-    text-align: center;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 20px;
-}
-
-/* Card de Lição */
-.lesson-card {
-    border: 1px solid #eee;
-    padding: 15px;
-    margin-bottom: 12px;
-    border-radius: 8px;
-    border-left: 4px solid var(--dourado);
-    background: #fff;
-    transition: 0.3s;
-}
-
-.lesson-card:hover {
-    background: #fffdf5;
-}
-
-.status {
-    float: right;
-    background: var(--dourado);
-    color: var(--branco);
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 10px;
-    font-weight: bold;
-}
-
-.date {
-    font-size: 14px;
-    font-weight: bold;
-    color: var(--dourado);
-}
+/* Nav e Layout */
+header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #FFD700; padding-bottom: 10px; }
+.logo-pequena { width: 80px; }
+.card { background: #1a1a1a; padding: 20px; margin: 15px 0; border-left: 5px solid #FFD700; text-align: left; border-radius: 5px; }
+.btn-sair { background: #555; color: white; }
